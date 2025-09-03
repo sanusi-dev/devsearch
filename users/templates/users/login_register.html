@@ -1,0 +1,96 @@
+{% extends "main.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    {% if current_url_name == 'login' %}
+        <div class="auth">
+            <div class="card">
+                <div class="auth__header text-center">
+                    <a href="/">
+                        <img src="{% static 'images/icon.svg' %}" alt="icon" />
+                    </a>
+                    <h3>Account Login</h3>
+                    <p>Hello Developer, Welcome Back!</p>
+                </div>
+                <form action="" class="form auth__form" method="post">
+                    {% csrf_token %}
+                    <!-- Input:Email -->
+                    {% for field in login_form %}
+                        <div class="form__field">
+                            <label for="formInput#text">{{ field.label }}:</label>
+                            {% if field.name == 'username' %}
+                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:Enter your username..." }}
+                            {% elif  field.name == 'password' %}
+                                {{ field|add_class:"input input--password"|attr:"id:formInput#passowrd"|attr:"placeholder:••••••••" }}
+                            {% endif %}
+                            {% for error in field.errors %}<span class="error-message">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if login_form.non_field_errors %}
+                        <ul class="errorlist">
+                            {% for error in login_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    <div class="auth__actions">
+                        <input class="btn btn--sub btn--lg"
+                               type="submit"
+                               name="login_submit"
+                               value="Log In" />
+                        <a href="{% url 'password_reset' %}">Forget Password?</a>
+                    </div>
+                </form>
+                <div class="auth__alternative">
+                    <p>Don’t have an Account?</p>
+                    <a href="{% url 'signup' %}">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="auth">
+            <div class="card">
+                <div class="auth__header text-center">
+                    <a href="/">
+                        <img src="{% static 'images/icon.svg' %}" alt="icon" />
+                    </a>
+                    <h3>Account SignUp</h3>
+                    <p>Create a new developer account</p>
+                </div>
+                <form action="" class="form auth__form" method="post">
+                    {% csrf_token %}
+                    {% for field in register_form %}
+                        <div class="form__field">
+                            <label for="formInput#text">{{ field.label }}:</label>
+                            {% if field.name == 'username' %}
+                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:e.g. Dennis1234" }}
+                            {% elif field.name == 'email' %}
+                                {{ field|add_class:"input input--email"|attr:"id:formInput#email"|attr:"placeholder:e.g. user@domain.com" }}
+                            {% elif field.name == 'name' %}
+                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:e.g. Dennis Ivanov" }}
+                            {% elif field.name == 'password1' %}
+                                {{ field|add_class:"input input--password"|attr:"id:formInput#password"|attr:"placeholder:••••••••" }}
+                            {% elif field.name == 'password2' %}
+                                {{ field|add_class:"input input--password"|attr:"id:formInput#confirm-passowrd"|attr:"placeholder:••••••••" }}
+                            {% endif %}
+                            {% for error in field.errors %}<span class="error-message">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if register_form.non_field_errors %}
+                        <ul class="errorlist">
+                            {% for error in register_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    <div class="auth__actions">
+                        <input class="btn btn--sub btn--lg"
+                               type="submit"
+                               name="signup_submit"
+                               value="Sign  In" />
+                    </div>
+                </form>
+                <div class="auth__alternative">
+                    <p>Already have an Account?</p>
+                    <a href="{% url 'login' %}">Log In</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}
