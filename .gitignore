@@ -31,3 +31,14 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+.venv
+
+# Node
+node_modules/
+
+# Tailwind
+static/styles/output.css
+
+# Django Static
+staticfiles/
+static_root/

@@ -1,17 +1,17 @@
 {% extends "main.html" %}
 {% block content %}
-    <main class="formPage my-xl">
-        <div class="content-box">
-            <div class="formWrapper">
-                <a class="backButton" href="#"><i class="im im-angle-left"></i></a>
-                <br>
-                <form class="form" method="post">
-                    {% csrf_token %}
-                    <p>Are your sure you want to delete {{ skill|title }}?</p>
-                    <a class="btn btn--sub btn--lg  my-md" href="{% url 'account' %}">&#x2190 Go Back</a>
-                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Delete" />
-                </form>
-            </div>
+    <main class="my-[8rem] animate-fade-in">
+        <div class="content-box text-center">
+            <a class="back-btn mx-auto mb-[2rem]" href="{% url 'account' %}"><i class="im im-angle-left"></i></a>
+            <h3 class="text-[2.4rem] font-bold text-sub mb-[1rem]">Delete Skill</h3>
+            <form class="form" method="post">
+                {% csrf_token %}
+                <p class="text-[1.6rem] text-text/70 my-[2rem]">Are you sure you want to delete <strong class="text-sub">{{ skill|title }}</strong>?</p>
+                <div class="flex justify-center gap-[1.5rem] mt-[3rem]">
+                    <a class="btn btn--transparent text-[1.4rem]" href="{% url 'account' %}">&#x2190 Go Back</a>
+                    <input class="btn bg-error text-white border-error hover:bg-error/80 hover:border-error/80 text-[1.4rem]" type="submit" value="Delete" />
+                </div>
+            </form>
         </div>
     </main>
 {% endblock content %}

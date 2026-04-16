@@ -3,80 +3,99 @@
 {% load widget_tweaks %}
 {% block content %}
     <!-- Main Section -->
-    <main class="singleProject my-md">
+    <main class="my-[4rem] mx-auto animate-fade-in">
         <div class="container">
-            <div class="layout">
-                <div class="column column--1of3">
-                    <h3 class="singleProject__subtitle">Tools & Stacks</h3>
-                    <div class="singleProject__toolStack">
-                        {% for tag in project.tags.all %}
-                            <span class="tag tag--pill tag--sub tag--lg">
-                                <small>{{ tag }}</small>
-                            </span>
-                        {% endfor %}
+            <div class="layout flex flex-col md:flex-row">
+                <!-- Sidebar -->
+                <div class="column column--1of3 order-2 md:order-1">
+                    <div class="card p-[3rem] md:sticky md:top-[8rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">Tools & Stacks</h3>
+                        <div class="mt-[1rem] mb-[3rem] flex flex-wrap gap-2">
+                            {% for tag in project.tags.all %}
+                                <span class="tag tag--pill tag--sub tag--lg">
+                                    <small>{{ tag }}</small>
+                                </span>
+                            {% endfor %}
+                        </div>
+                        <div class="border-t border-light/60 pt-[2rem] space-y-[1.5rem]">
+                            {% if project.source_link %}
+                                <a class="flex items-center gap-[1rem] text-[1.5rem] font-medium text-text hover:text-main transition-colors duration-200 group"
+                                   href="{{ project.source_link }}"
+                                   target="_blank">
+                                    <i class="im im-external-link text-main/60 group-hover:text-main transition-colors"></i>
+                                    <span>Source Code</span>
+                                </a>
+                            {% endif %}
+                            {% if project.demo_link %}
+                                <a class="flex items-center gap-[1rem] text-[1.5rem] font-medium text-text hover:text-main transition-colors duration-200 group"
+                                   href="{{ project.demo_link }}"
+                                   target="_blank">
+                                    <i class="im im-external-link text-main/60 group-hover:text-main transition-colors"></i>
+                                    <span>Live Demo</span>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% if project.source_link %}
-                        <a class="singleProject__liveLink"
-                           href="{{ project.source_link }}"
-                           target="_blank"><i class="im im-external-link"></i>Source Code
-                        </a>
-                    {% endif %}
-                    {% if project.demo_link %}
-                        <a class="singleProject__liveLink"
-                           href="{{ project.demo_link }}"
-                           target="_blank"><i class="im im-external-link"></i>Live Demo
-                        </a>
-                    {% endif %}
                 </div>
-                <div class="column column--2of3">
-                    <img class="singleProject__preview"
-                         src="{{ project.featured_image.url }}"
-                         alt="portfolio thumbnail" />
+                <!-- Main Content -->
+                <div class="column column--2of3 order-1 md:order-2">
+                    <div class="overflow-hidden rounded-2xl mb-[3rem] shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+                        <img class="h-[50vh] w-full object-cover object-top"
+                             src="{{ project.featured_image.url }}"
+                             alt="portfolio thumbnail" />
+                    </div>
                     <a href="{% url 'profile_detail' project.owner.id %}"
-                       class="singleProject__developer">{{ project.owner.name }}</a>
-                    <h2 class="singleProject__title">{{ project.title|title }}</h2>
-                    <h3 class="singleProject__subtitle">About the Project</h3>
-                    <div class="singleProject__info">{{ project.description|linebreaksbr }}</div>
-                    <div class="comments">
-                        <h3 class="singleProject__subtitle">Feedback</h3>
-                        <h5 class="project--rating">
-                            {{ project.vote_ratio }}% Postitive Feedback
+                       class="text-[1.6rem] font-medium text-main hover:underline">{{ project.owner.name }}</a>
+                    <h2 class="text-[3.6rem] font-bold text-sub mb-[2rem] mt-[0.5rem] leading-tight">{{ project.title|title }}</h2>
+
+                    <div class="card p-[3rem] mb-[3rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">About the Project</h3>
+                        <div class="text-[1.5rem] leading-[1.7] text-text/80">{{ project.description|linebreaksbr }}</div>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div class="card p-[3rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1rem]">Feedback</h3>
+                        <p class="mb-[2rem] text-[1.5rem] text-text/70">
+                            <span class="font-bold text-sub text-[1.8rem]">{{ project.vote_ratio }}%</span>
+                            Positive Feedback
                             ({{ project.vote_total }} Votes)
-                        </h5>
+                        </p>
                         {% if request.user.is_authenticated and request.user.profile.id == project.owner.id %}
-                            <p>You can not review your own work</p>
+                            <p class="text-text/60 italic">You cannot review your own work</p>
                         {% elif request.user.is_authenticated and request.user.profile.id in reviewers %}
-                            <p>Thanks for your review</p>
+                            <p class="text-success font-medium">Thanks for your review</p>
                         {% elif request.user.is_authenticated == False %}
                             <p>
-                                <a href="{% url 'login' %}?next={{ request.path }}">Login in to see a review</a>
+                                <a href="{% url 'login' %}?next={{ request.path }}" class="text-main font-medium hover:underline">Login to leave a review</a>
                             </p>
                         {% else %}
                             <form class="form" action="" method="POST">
                                 {% csrf_token %}
-                                <!-- Textarea -->
                                 {% for field in review_form %}
                                     <div class="form__field">
                                         <label for="formInput#textarea">{{ field.label }}</label>
                                         {{ field }}
                                     </div>
                                 {% endfor %}
-                                <input class="btn btn--sub btn--lg" type="submit" value="Comments" />
+                                <input class="btn btn--sub text-[1.4rem] mt-4" type="submit" value="Post Comment" />
                             </form>
                         {% endif %}
-                        <div class="commentList">
+
+                        <!-- Comments List -->
+                        <div class="mt-[3rem] space-y-[2.5rem]">
                             {% for review in project.review_set.all %}
                                 {% if review.body %}
-                                    <div class="comment">
-                                        <a href="{% url 'profile_detail' review.owner.id %}">
-                                            <img class="avatar avatar--md"
+                                    <div class="flex gap-[1.5rem] p-[1.5rem] rounded-xl bg-bg/60 hover:bg-bg transition-colors duration-200">
+                                        <a href="{% url 'profile_detail' review.owner.id %}" class="shrink-0">
+                                            <img class="w-[4.5rem] h-[4.5rem] rounded-full object-cover ring-2 ring-main/10 ring-offset-1"
                                                  src="{{ review.owner.profile_image.url }}"
                                                  alt="user" />
                                         </a>
-                                        <div class="comment__details">
+                                        <div>
                                             <a href="{% url 'profile_detail' review.owner.id %}"
-                                               class="comment__author">{{ review.owner.name }}</a>
-                                            <p class="comment__info">{{ review.body|linebreaksbr }}</p>
+                                               class="text-[1.6rem] font-semibold text-sub hover:text-main transition-colors">{{ review.owner.name }}</a>
+                                            <p class="text-[1.4rem] mt-[0.5rem] text-text/70 leading-[1.5]">{{ review.body|linebreaksbr }}</p>
                                         </div>
                                     </div>
                                 {% endif %}

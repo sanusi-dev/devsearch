@@ -1,20 +1,20 @@
 {% load static %}
 {% if page_obj.has_other_pages %}
-    <div class="pagination">
-        <ul class="container">
+    <div class="mt-[5rem] mb-[8rem]">
+        <ul class="container flex flex-wrap items-center justify-center gap-[1rem] list-none">
             {% if page_obj.has_previous %}
                 <li>
                     <a href="?page={{ page_obj.previous_page_number }}&search_query={{ search_query }}"
-                       class="btn">&#10094; Prev</a>
+                       class="btn btn--transparent text-[1.4rem]">&#10094; Prev</a>
                 </li>
             {% endif %}
             <li>
-                <a href="?page={{ page_obj.number }}" class="btn btn--sub">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
+                <a href="?page={{ page_obj.number }}" class="btn btn--sub text-white text-[1.4rem]">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
             </li>
             {% if page_obj.has_next %}
                 <li>
                     <a href="?page={{ page_obj.next_page_number }}&search_query={{ search_query }}"
-                       class="btn">Next &#10095;</a>
+                       class="btn btn--transparent text-[1.4rem]">Next &#10095;</a>
                 </li>
             {% endif %}
         </ul>

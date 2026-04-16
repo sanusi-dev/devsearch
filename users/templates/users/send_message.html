@@ -2,34 +2,32 @@
 {% load static %}
 {% block content %}
     <!-- Main Section -->
-    <main class="formPage my-xl">
+    <main class="my-[8rem] animate-fade-in">
         <div class="content-box">
-            <div class="formWrapper">
-                <a class="backButton" href="{% url 'profile_detail' pk=recipient.id %}"><i class="im im-angle-left"></i></a>
-                <br />
-                <form class="form" method="post">
-                    {% csrf_token %}
-                    {% if request.user.is_authenticated %}
+            <a class="back-btn" href="{% url 'profile_detail' pk=recipient.id %}"><i class="im im-angle-left"></i></a>
+            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Send Message</h3>
+            <p class="text-text/60 mb-[2rem] text-[1.4rem]">Write a message to {{ recipient.name }}.</p>
+            <form class="form" method="post">
+                {% csrf_token %}
+                {% if request.user.is_authenticated %}
+                    <div class="form__field">
+                        <label for="formInput#text">{{ message_form.subject.label }}</label>
+                        {{ message_form.subject }}
+                    </div>
+                    <div class="form__field">
+                        <label for="formInput#text">{{ message_form.body.label }}</label>
+                        {{ message_form.body }}
+                    </div>
+                {% else %}
+                    {% for field in message_form %}
                         <div class="form__field">
-                            <label for="formInput#text">{{ message_form.subject.label }}</label>
-                            {{ message_form.subject }}
+                            <label for="formInput#text">{{ field.label }}</label>
+                            {{ field }}
                         </div>
-                        <div class="form__field">
-                            <label for="formInput#text">{{ message_form.body.label }}</label>
-                            {{ message_form.body }}
-                        </div>
-                    {% else %}
-                        {% for field in message_form %}
-                            <!-- Input:Text -->
-                            <div class="form__field">
-                                <label for="formInput#text">{{ field.label }}</label>
-                                {{ field }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    <input class="btn btn--sub btn--lg my-md" type="submit" value="Submit" />
-                </form>
-            </div>
+                    {% endfor %}
+                {% endif %}
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Send Message" />
+            </form>
         </div>
     </main>
 {% endblock content %}

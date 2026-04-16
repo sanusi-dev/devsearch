@@ -2,26 +2,35 @@
 {% load static %}
 {% block content %}
     <!-- Main Section -->
-    <main class="inbox my-xl">
+    <main class="my-[6rem] animate-fade-in">
         <div class="content-box">
-            <h3 class="inbox__title">
-                New Messages(<span>{{ un_read }}</span>)
-            </h3>
-            <ul class="messages">
+            <div class="flex items-center justify-between mb-[3rem]">
+                <h3 class="uppercase text-[2.2rem] font-bold text-sub tracking-wider">
+                    Messages
+                </h3>
+                <span class="inline-flex items-center justify-center bg-main/10 text-main font-bold text-[1.4rem] rounded-full px-[1.5rem] py-[0.5rem]">{{ un_read }} unread</span>
+            </div>
+            <ul class="list-none space-y-[0.5rem]">
                 {% for message in profile.messages.all %}
                     {% if message.is_read %}
-                        <li class="message message">
-                        {% else %}
-                            <li class="message message--unread">
-                            {% endif %}
-                            <a href="{% url 'message' message.id %}">
-                                <span class="message__author">{{ message.name }}</span>
-                                <span class="message__subject">{{ message.subject }}</span>
-                                <span class="message__date">{{ message.created_at }}</span>
+                        <li>
+                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl transition-all duration-200 hover:bg-bg group">
+                                <span class="basis-[25%] font-medium text-text/60 group-hover:text-sub transition-colors text-[1.45rem]">{{ message.name }}</span>
+                                <span class="basis-[50%] text-text/50 text-[1.4rem]">{{ message.subject }}</span>
+                                <span class="basis-[25%] text-right text-text/40 text-[1.3rem]">{{ message.created_at }}</span>
                             </a>
                         </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </main>
-    {% endblock content %}
+                    {% else %}
+                        <li>
+                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl bg-main/[0.04] border border-main/10 transition-all duration-200 hover:bg-main/[0.08] group">
+                                <span class="basis-[25%] font-bold text-sub text-[1.45rem]">{{ message.name }}</span>
+                                <span class="basis-[50%] font-semibold text-sub text-[1.4rem]">{{ message.subject }}</span>
+                                <span class="basis-[25%] text-right text-text/50 text-[1.3rem]">{{ message.created_at }}</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </main>
+{% endblock content %}

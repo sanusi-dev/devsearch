@@ -16,19 +16,19 @@ def create_profile(sender, instance, created, *args, **kwargs):
             username = user.username,
         )
 
-    subject = 'Account Successfully Registered'
-    message = """
-                It is a long established fact that a reader will be distracted by the readable content of a 
-                page when looking at its layout.
-            """
-    recipient = instance.email
-    send_mail(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        [recipient],
-        fail_silently=False
-    )
+        subject = 'Account Successfully Registered'
+        message = """
+                    It is a long established fact that a reader will be distracted by the readable content of a 
+                    page when looking at its layout.
+                """
+        recipient = instance.email
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [recipient],
+            fail_silently=False
+        )
 @receiver(post_save, sender=Profile)
 def update_user(instance, created, *args, **kwargs):
     profile = instance

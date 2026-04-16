@@ -2,82 +2,93 @@
 {% load static %}
 {% block content %}
     <!-- Main Section -->
-    <main class="profile my-md">
+    <main class="my-[4rem] animate-fade-in">
         <div class="container">
             <div class="layout">
+                <!-- Profile Sidebar -->
                 <div class="column column--1of3">
-                    <div class="card text-center">
-                        <div class="card__body dev">
-                            <img class="avatar avatar--xl" src="{{ profile.profile_image.url }}" />
-                            <h2 class="dev__name">{{ profile.name }}</h2>
-                            <p class="dev__title">{{ profile.short_intro }}</p>
-                            <p class="dev__location">Based in {{ profile.location }}</p>
-                            <ul class="dev__social">
+                    <div class="card text-center md:sticky md:top-[8rem]">
+                        <div class="p-[4rem]">
+                            <img class="avatar avatar--xl block mx-auto" src="{{ profile.profile_image.url }}" />
+                            <h2 class="text-sub text-[2.8rem] font-bold mt-[1.5rem] mb-[0.3rem]">{{ profile.name }}</h2>
+                            <p class="text-[1.5rem] font-medium text-text/70 leading-[1.4]">{{ profile.short_intro }}</p>
+                            <p class="mt-[0.8rem] text-[1.3rem] text-text/50 flex items-center justify-center gap-[0.5rem]">
+                                <i class="im im-location text-main/50"></i> Based in {{ profile.location }}
+                            </p>
+                            <ul class="my-[2.5rem] list-none flex justify-center gap-[1.2rem]">
                                 <li>
-                                    <a title="Github" href="{{ profile.social_github }}" target="_blank"><i class="im im-github"></i></a>
+                                    <a title="Github" href="{{ profile.social_github }}" class="w-[3.8rem] h-[3.8rem] rounded-full bg-bg flex items-center justify-center text-[1.6rem] text-text/60 hover:text-main hover:bg-main/10 transition-all duration-200" target="_blank"><i class="im im-github"></i></a>
                                 </li>
                                 <li>
-                                    <a title="Twitter" href="{{ profile.social_twitter }}" target="_blank"><i class="im im-twitter"></i></a>
+                                    <a title="Twitter" href="{{ profile.social_twitter }}" class="w-[3.8rem] h-[3.8rem] rounded-full bg-bg flex items-center justify-center text-[1.6rem] text-text/60 hover:text-main hover:bg-main/10 transition-all duration-200" target="_blank"><i class="im im-twitter"></i></a>
                                 </li>
                                 <li>
-                                    <a title="LinkedIn" href="{{ profile.social_linkedin }}" target="_blank"><i class="im im-linkedin"></i></a>
+                                    <a title="LinkedIn" href="{{ profile.social_linkedin }}" class="w-[3.8rem] h-[3.8rem] rounded-full bg-bg flex items-center justify-center text-[1.6rem] text-text/60 hover:text-main hover:bg-main/10 transition-all duration-200" target="_blank"><i class="im im-linkedin"></i></a>
                                 </li>
                                 <li>
                                     <a title="Personal Website"
-                                       href="{{ profile.social_website }}"
+                                       href="{{ profile.social_website }}" class="w-[3.8rem] h-[3.8rem] rounded-full bg-bg flex items-center justify-center text-[1.6rem] text-text/60 hover:text-main hover:bg-main/10 transition-all duration-200"
                                        target="_blank"><i class="im im-globe"></i></a>
                                 </li>
                             </ul>
                             {% if request.user.profile != profile %}
                                 <a href="{% url 'send_message' pk=profile.id %}"
-                                   class="btn btn--sub btn--lg">Send Message</a>
+                                   class="btn btn--main text-[1.4rem]">Send Message</a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                <!-- Profile Content -->
                 <div class="column column--2of3">
-                    <div class="devInfo">
-                        <h3 class="devInfo__title">About Me</h3>
-                        <p class="devInfo__about">{{ profile.bio|linebreaksbr }}</p>
+                    <!-- About -->
+                    <div class="card p-[3rem] mb-[2.5rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">About Me</h3>
+                        <p class="text-[1.45rem] leading-[1.7] text-text/80">{{ profile.bio|linebreaksbr }}</p>
                     </div>
-                    <div class="devInfo">
-                        <h3 class="devInfo__title">Skills</h3>
-                        <div class="devInfo__skills">
+                    <!-- Skills -->
+                    <div class="card p-[3rem] mb-[2.5rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[2rem]">Skills</h3>
+                        <div class="space-y-[2rem]">
                             {% for skill in profile.skill_set.all %}
-                                <div class="devSkill">
-                                    <h4 class="devSkill__title">{{ skill.name|title }}</h4>
-                                    <p class="devSkill__info">{{ skill.description }}</p>
+                                {% if skill.description %}
+                                <div class="md:flex md:gap-[2rem] p-[1.5rem] rounded-xl bg-bg/50 hover:bg-bg transition-colors duration-200">
+                                    <h4 class="text-[1.55rem] font-semibold text-sub shrink-0 md:w-[18%] mb-1 md:mb-0">{{ skill.name|title }}</h4>
+                                    <p class="text-[1.4rem] leading-[1.6] text-text/70">{{ skill.description }}</p>
                                 </div>
+                                {% endif %}
                             {% endfor %}
-                            <h3 class="devInfo__subtitle">Other Skills</h3>
-                            <div class="devInfo__otherSkills">
-                                {% for skill in profile.skill_set.all %}
-                                    {% if not skill.description %}
-                                        <span class="tag tag--pill tag--sub tag--lg">
-                                            <small>{{ skill.name }}</small>
-                                        </span>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                        </div>
+                        <h4 class="text-[1.5rem] text-sub/60 uppercase font-bold mt-[3rem] mb-[1.2rem] tracking-wider">Other Skills</h4>
+                        <div class="flex flex-wrap gap-2">
+                            {% for skill in profile.skill_set.all %}
+                                {% if not skill.description %}
+                                    <span class="tag tag--pill tag--sub tag--lg">
+                                        <small>{{ skill.name }}</small>
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    <div class="devInfo">
-                        <h3 class="devInfo__title">Projects</h3>
+                    <!-- Projects -->
+                    <div class="mb-[3rem]">
+                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[2rem]">Projects</h3>
                         <div class="grid grid--two">
                             {% for project in profile.project_set.all %}
                                 <div class="column">
-                                    <div class="card project">
-                                        <a href="{% url 'project_detail' project.id %}" class="project">
-                                            <img class="project__thumbnail"
-                                                 src="{{ project.featured_image.url }}"
-                                                 alt="project thumbnail" />
+                                    <div class="card hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
+                                        <a href="{% url 'project_detail' project.id %}" class="block group">
+                                            <div class="overflow-hidden">
+                                                <img class="h-[25rem] w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                                                     src="{{ project.featured_image.url }}"
+                                                     alt="project thumbnail" />
+                                            </div>
                                             <div class="card__body">
-                                                <h3 class="project__title">{{ project.title }}</h3>
-                                                <p class="project--rating">
-                                                    <span style="font-weight: bold">{{ project.vote_ratio }}%</span>
-                                                    Postitive Feedback ({{ project.vote_total }} Votes)
+                                                <h3 class="text-[1.9rem] font-bold text-sub group-hover:text-main transition-colors duration-200">{{ project.title }}</h3>
+                                                <p class="mt-[0.5rem] mb-[1.4rem] text-text/60 text-[1.3rem]">
+                                                    <span class="font-bold text-sub">{{ project.vote_ratio }}%</span>
+                                                    Positive Feedback ({{ project.vote_total }} Votes)
                                                 </p>
-                                                <div class="project__tags">
+                                                <div class="flex flex-wrap gap-2">
                                                     {% for tag in project.tags.all %}
                                                         <span class="tag tag--pill tag--main">
                                                             <small>{{ tag }}</small>

@@ -2,23 +2,21 @@
 {% load static %}
 {% block content %}
     <!-- Main Section -->
-    <main class="formPage my-xl">
+    <main class="my-[8rem] animate-fade-in">
         <div class="content-box">
-            <div class="formWrapper">
-                <a class="backButton" href="{% url 'project_list' %}"><i class="im im-angle-left"></i></a>
-                <br />
-                <form class="form" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <!-- Input:Text -->
-                        <div class="form__field">
-                            <label for="formInput#text">{{ field.label }}</label>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
-                    <input class="btn btn--sub btn--lg my-md" type="submit" value="Submit" />
-                </form>
-            </div>
+            <a class="back-btn" href="{% url 'project_list' %}"><i class="im im-angle-left"></i></a>
+            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Create Project</h3>
+            <p class="text-text/60 mb-[2rem] text-[1.4rem]">Fill in the details below to add a new project.</p>
+            <form class="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form__field">
+                        <label for="formInput#text">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Submit" />
+            </form>
         </div>
     </main>
 {% endblock content %}

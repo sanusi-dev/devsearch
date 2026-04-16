@@ -66,8 +66,8 @@ def profile_detail(request, pk):
 
 @login_required(login_url='login')
 def user_account(request):
-    profile = request.user.profile
-    context = {'profile': profile}
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    context = {"profile": profile}
     return render(request, 'users/user_account.html', context)
 
 @login_required(login_url='login')

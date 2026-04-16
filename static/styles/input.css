@@ -1,0 +1,177 @@
+@tailwind base;
+
+@layer base {
+  html {
+    font-size: 50%;
+  }
+  @media only screen and (min-width: 480px) {
+    html {
+      font-size: 56.25%;
+    }
+  }
+  @media only screen and (min-width: 1200px) {
+    html {
+      font-size: 62.5%;
+    }
+  }
+  @media only screen and (min-width: 2100px) {
+    html {
+      font-size: 75%;
+    }
+  }
+
+  body {
+    @apply leading-relaxed font-normal text-[1.5rem] tracking-wide text-text bg-bg min-h-screen font-sans;
+  }
+
+  /* Smooth scrolling & selection */
+  html { scroll-behavior: smooth; }
+  ::selection { @apply bg-main/20 text-sub; }
+
+  a { @apply no-underline transition-colors duration-200; }
+}
+
+@layer components {
+  /* ─── Container ─── */
+  .container { @apply w-[92%] max-w-[165rem] mx-auto md:w-[90%] lg:w-[80%] 2xl:w-[72%]; }
+  .container--narrow { @apply max-w-[120rem] md:w-[85%] lg:w-[72%] 2xl:w-[65%]; }
+
+  /* ─── Buttons (upgraded: pill shape, glow, micro-interactions) ─── */
+  .btn {
+    @apply inline-block py-[1rem] px-[2.5rem] text-[1.6rem] font-medium rounded-full border-2
+           cursor-pointer transition-all duration-300 ease-out
+           active:scale-95;
+  }
+  .btn--sub {
+    @apply bg-sub-light text-white border-sub-light
+           hover:bg-sub hover:border-sub hover:text-white
+           hover:shadow-[0_4px_20px_rgba(45,45,57,0.35)];
+  }
+  .btn--main {
+    @apply bg-main text-white border-main
+           hover:bg-transparent hover:text-main
+           hover:shadow-[0_4px_20px_rgba(90,165,185,0.35)];
+  }
+  .btn--transparent {
+    @apply bg-transparent text-main border-main
+           hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(90,165,185,0.25)];
+  }
+
+  /* ─── Mobile menu ─── */
+  .toggle-menu { @apply relative md:hidden; }
+  .toggle-menu-span { @apply block fixed top-[1.5rem] right-[2.75rem] cursor-pointer p-[1rem] bg-sub-light z-[999] text-[0px] w-[5rem] h-[5rem] rounded-full; }
+  .toggle-menu__lines { @apply pointer-events-none block h-[2px] w-[2.5rem] fixed top-[4rem] right-[4rem] z-[999] bg-light transition-all duration-300; }
+  .toggle-menu__lines::before, .toggle-menu__lines::after { content: ''; @apply pointer-events-none block h-[2px] w-[2.5rem] fixed z-[999] bg-light transition-all duration-300; }
+  .toggle-menu__lines::before { top: 3.4rem; transform-origin: 0 0; }
+  .toggle-menu__lines::after { top: 4.6rem; transform-origin: 0 0; }
+
+  .peer:checked + .toggle-menu .toggle-menu__lines::before { margin-left: 3px; transform: rotate(45deg) scaleX(1.2) translateX(-2px) translateY(-4px); }
+  .peer:checked + .toggle-menu .toggle-menu__lines { visibility: hidden; }
+  .peer:checked + .toggle-menu .toggle-menu__lines::after { transform: rotate(-45deg) scaleX(1.2) translateX(-2px) translateY(3px); }
+
+  /* ─── Tags (upgraded: translucent chips) ─── */
+  .tag {
+    @apply inline-flex items-center h-fit w-fit rounded-[0.5rem]
+           py-[0.5rem] px-[1.5rem] text-[1.2rem] cursor-pointer
+           transition-all duration-200;
+  }
+  .tag:not(:last-child) { @apply mr-[0.25rem] mb-[0.75rem]; }
+  .tag > small { @apply text-white; }
+  .tag--outline { @apply bg-transparent border-2 border-sub py-[0.4rem] px-[1rem]; }
+  .tag--outline > small { @apply text-sub; }
+  .tag--pill { @apply rounded-full; }
+  .tag--main {
+    @apply bg-main/10 text-main font-medium
+           hover:bg-main/20;
+  }
+  .tag--main > small { @apply text-main font-medium; }
+  .tag--sub {
+    @apply bg-sub/10 text-sub-light font-medium
+           hover:bg-sub/20;
+  }
+  .tag--sub > small { @apply text-sub-light font-medium; }
+  .tag--lg { @apply py-[0.8rem] px-[3rem] text-[1.4rem]; }
+  .tag--lg:not(:last-child) { @apply mr-[0.5rem] mb-[1rem]; }
+
+  /* ─── Cards (upgraded: soft shadows, rounded, lift effect) ─── */
+  .card {
+    @apply rounded-2xl bg-white w-auto h-auto my-[0.5rem] overflow-hidden
+           shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)]
+           border border-light/50
+           transition-all duration-300 ease-out;
+  }
+  .card__body, .card__header { @apply p-[2rem_2.5rem]; }
+  .card__header { @apply py-[1.5rem] border-b border-light/60; }
+  .card__headerTitle { @apply text-[2.2rem] font-medium; }
+  .card.card--dark { @apply bg-light; }
+
+  /* ─── Forms (upgraded: softer inputs, focus glow) ─── */
+  .form { @apply block; }
+  .form__field { @apply my-[1.5rem]; }
+  .form__label, .form__field > label { @apply block mb-[0.5rem] text-text font-medium text-[1.4rem]; }
+  .input {
+    @apply min-w-[24rem] w-full py-[1.2rem] px-[1.5rem] rounded-xl
+           border-2 border-transparent bg-bg
+           transition-all duration-300
+           hover:bg-light/40
+           focus:outline-none focus:bg-white focus:border-main
+           focus:ring-4 focus:ring-main/15;
+  }
+  .input--textarea { @apply min-h-[14rem] resize-none; }
+
+  /* ─── Grids ─── */
+  .grid { @apply flex flex-row flex-wrap space-y-4 md:space-y-0 -mx-[1rem]; }
+  .grid > .column { @apply px-[1rem] mb-[3rem]; }
+  .grid--three > .column { @apply md:w-[33.333%]; }
+  .grid--two > .column { @apply md:w-[50%]; }
+
+  /* ─── Layout columns ─── */
+  .layout { @apply flex flex-row flex-wrap justify-between; }
+  .layout > .column { @apply mb-[3rem] w-full; }
+  .layout > .column.column--1of3 { @apply md:w-[30%]; }
+  .layout > .column.column--2of3 { @apply md:w-[64%]; }
+  .layout > .column.column--1of2 { @apply md:w-[48%]; }
+
+  /* ─── Avatars (upgraded: ring accent) ─── */
+  .avatar { @apply inline-block object-cover rounded-full ring-2 ring-main/20 ring-offset-2; }
+  .avatar--md { @apply w-[6rem] h-[6rem]; }
+  .avatar--xl { @apply w-[14rem] h-[14rem]; }
+
+  /* ─── Content box (shared wrapper for form & message pages) ─── */
+  .content-box {
+    @apply w-[95%] max-w-[85rem] mx-auto bg-white
+           p-[3.5rem_5rem] rounded-2xl
+           shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)]
+           border border-light/50;
+  }
+
+  /* ─── Back button ─── */
+  .back-btn {
+    @apply bg-main/10 text-main w-[4rem] h-[4rem] flex items-center justify-center
+           rounded-full text-[1.8rem] transition-all duration-300
+           hover:-translate-y-1 hover:shadow-lg hover:bg-main/20;
+  }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Custom Keyframes & Utilities ─── */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out both;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out both;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(2rem); }
+  to { opacity: 1; transform: translateY(0); }
+}

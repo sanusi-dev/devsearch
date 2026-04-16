@@ -1,53 +1,54 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
-    <main class="projects">
-        <section class="hero-section text-center">
-            <div class="container container--narrow">
-                <div class="hero-section__box">
-                    <h2>
-                        Search for <span>Projects</span>
+    <main>
+        <!-- Hero Section: Gradient Mesh -->
+        <section class="relative flex items-center justify-center h-[32vh] text-center overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-bg via-main-light to-sub-lighter"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(90,165,185,0.15)_0%,transparent_60%)]"></div>
+            <div class="relative z-10 container container--narrow animate-fade-in">
+                <div class="mb-[2.5rem]">
+                    <h2 class="text-[4.2rem] text-sub uppercase font-extralight leading-[1.2] tracking-tight max-md:text-[3rem] max-sm:text-[2.4rem]">
+                        Search for <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-sub to-main">Projects</span>
                     </h2>
                 </div>
-                <div class="hero-section__search">
-                    <form class="form" action="" method="get">
+                <div>
+                    <form class="flex items-center justify-center gap-[1.5rem] max-md:flex-col max-md:gap-0 max-md:items-stretch" action="" method="get">
                         <div class="form__field">
-                            <label for="formInput#search">Search By Projects</label>
-                            <input class="input input--text"
+                            <label for="formInput#search" class="sr-only">Search By Projects</label>
+                            <input class="input min-w-[50rem] w-full max-sm:min-w-0 !bg-white/70 !backdrop-blur-sm !border-light/60 focus:!bg-white focus:!ring-main/15"
                                    id="formInput#search"
                                    type="text"
                                    name="search_query"
                                    value="{{ search_query }}"
                                    placeholder="Search by Project Title" />
                         </div>
-                        <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+                        <input class="btn btn--sub text-[1.4rem] py-[1.2rem] px-[3rem]" type="submit" value="Search" />
                     </form>
                 </div>
             </div>
         </section>
-        <!-- Search Result: DevList -->
-        <section class="projectsList">
+        <!-- Project Cards -->
+        <section class="mt-[6rem] mb-[4rem]">
             <div class="container">
                 <div class="grid grid--three">
                     {% for project in page_obj %}
                         <div class="column">
-                            <div class="card project">
-                                <a href="{% url 'project_detail' project.id %}" class="project">
-                                    <img class="project__thumbnail"
-                                         src="{{ project.featured_image.url }}"
-                                         alt="project thumbnail" />
+                            <div class="card hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] animate-slide-up" style="animation-delay: {{ forloop.counter0 }}00ms">
+                                <a href="{% url 'project_detail' project.id %}" class="block group">
+                                    <div class="overflow-hidden">
+                                        <img class="h-[25rem] w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                                             src="{{ project.featured_image.url }}"
+                                             alt="project thumbnail" />
+                                    </div>
                                     <div class="card__body">
-                                        <h3 class="project__title">{{ project.title|title }}</h3>
-                                        <p>
-                                            <a class="project__author"
-                                               href="{% url 'profile_detail' project.owner.id %}">{{ project.owner.name }}</a>
-                                        </p>
-                                        <p class="project--rating">
-                                            <span style="font-weight: bold">{{ project.vote_ratio }}%</span>
-                                            Postitive Feedback ({{ project.vote_total }}
+                                        <h3 class="text-[2rem] font-bold text-sub group-hover:text-main transition-colors duration-200">{{ project.title|title }}</h3>
+                                        <p class="mt-[0.5rem] mb-[1.6rem] text-text/70 text-[1.35rem]">
+                                            <span class="font-bold text-sub">{{ project.vote_ratio }}%</span>
+                                            Positive Feedback ({{ project.vote_total }}
                                             Vote{{ project.vote_total|pluralize:"s" }})
                                         </p>
-                                        <div class="project__tags">
+                                        <div class="flex flex-wrap gap-2">
                                             {% for tag in project.tags.all %}
                                                 <span class="tag tag--pill tag--main">
                                                     <small>{{ tag }}</small>
