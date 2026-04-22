@@ -1,22 +1,54 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
+    {% partialdef project-form-partial inline %}
     <!-- Main Section -->
-    <main class="my-[8rem] animate-fade-in">
+    <main class="my-[8rem] animate-fade-in" id="form-container">
         <div class="content-box">
-            <a class="back-btn" href="{% url 'project_list' %}"><i class="im im-angle-left"></i></a>
-            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Create Project</h3>
+            <a class="back-btn"
+               href="{% url 'account' %}"
+               hx-target="#form-container"
+               hx-swap="outerHTML show:window:top"><i class="im im-angle-left">Back</i></a>
+            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">{{ form_title|default:"Create Project" }}</h3>
             <p class="text-text/60 mb-[2rem] text-[1.4rem]">Fill in the details below to add a new project.</p>
-            <form class="form" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+            <form class="form"
+                  {% if project %}
+                      hx-post="{% url 'update_project' project.id %}"
+                  {% else %}
+                      hx-post="{% url 'project_create' %}"
+                  {% endif %}
+                  hx-target="#form-container"
+                  hx-swap="outerHTML show:window:top"
+                  hx-encoding="multipart/form-data"
+                  hx-push-url="true">
                 {% for field in form %}
                     <div class="form__field">
-                        <label for="formInput#text">{{ field.label }}</label>
-                        {{ field }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.name == 'tags' %}
+                            <div class="flex flex-wrap gap-3 mt-2">
+                                {% for checkbox in field %}
+                                    <div class="relative flex items-center">
+                                        {{ checkbox.tag }}
+                                        <label for="{{ checkbox.id_for_label }}"
+                                               class="cursor-pointer inline-flex items-center rounded-full border-2 border-sub/20 px-4 py-1.5 text-[1.4rem] text-text hover:bg-sub/5 transition-colors bg-white peer-checked:bg-main peer-checked:text-white peer-checked:border-main select-none font-medium shadow-sm">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
                     </div>
                 {% endfor %}
-                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Submit" />
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]"
+                       type="submit"
+                       value="Submit" />
             </form>
         </div>
     </main>
+{% endpartialdef %}
 {% endblock content %}

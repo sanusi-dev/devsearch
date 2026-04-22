@@ -42,3 +42,17 @@ static/styles/output.css
 # Django Static
 staticfiles/
 static_root/
+
+# Node Configs
+package.json
+package-lock.json
+
+# Tailwind Config
+tailwind.config.js
+
+# Agent
+.agent/
+
+# Seed Generated Images
+static/images/profilepic.jpg
+static/images/profiles/profilepic.jpg

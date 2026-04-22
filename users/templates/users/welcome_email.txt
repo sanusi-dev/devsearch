@@ -1,0 +1,15 @@
+Welcome to DevSearch, {{ profile.name }}!
+
+We're thrilled to have you join our community.
+
+DevSearch is the perfect place to discover amazing developer projects, showcase your own work, and connect with peers around the globe.
+
+Get Started:
+- Complete your profile: Add your bio, social links, and skills to stand out.
+- Add your projects: Let others see what you've been building.
+- Connect: Send messages right from the platform to fellow developers.
+
+If you have any questions or need help, feel free to reach out to us.
+
+Happy coding,
+The DevSearch Team

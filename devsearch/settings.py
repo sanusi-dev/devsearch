@@ -16,10 +16,21 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    # Third-party
+    "django_htmx",
+    "mailer",
+    "widget_tweaks",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.github",
+    # Local
     "projects.apps.ProjectsConfig",
     "users.apps.UsersConfig",
-    "widget_tweaks",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -29,6 +40,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "devsearch.urls"
@@ -49,6 +62,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "devsearch.wsgi.application"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 
 # Database
@@ -104,9 +122,54 @@ DEBUG= config("DEBUG", default=False, cast=bool)
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_ROOT = BASE_DIR / "static/images"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# ---------------------------------------------------------------------------
+# Email Configuration
+# ---------------------------------------------------------------------------
+# MAILER_EMPTY_QUEUE_SLEEP = 5
+if DEBUG:
+    # Use django-mailer even in dev so we can test background automation
+    # Emails will be sent to your actual Gmail address.
+    EMAIL_BACKEND = "mailer.backend.DbBackend"
+    MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+else:
+    # Production: Use django-mailer queue
+    EMAIL_BACKEND = "mailer.backend.DbBackend"
+    MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# ---------------------------------------------------------------------------
+# django-allauth configuration
+# ---------------------------------------------------------------------------
+
+# Account (email + password) settings
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+# Social account settings
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+# Redirect URLs
+LOGIN_REDIRECT_URL = "/profiles/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
+LOGIN_URL = "/login/"
+
+# GitHub provider — credentials from environment
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {
+        "SCOPE": ["user:email"],
+        "APP": {
+            "client_id": config("GITHUB_CLIENT_ID", default=""),
+            "secret": config("GITHUB_CLIENT_SECRET", default=""),
+        },
+    },
+}

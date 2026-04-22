@@ -2,8 +2,10 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
+    {% partialdef project-detail-partial inline %}
     <!-- Main Section -->
-    <main class="my-[4rem] mx-auto animate-fade-in">
+    <main class="my-[4rem] mx-auto animate-fade-in"
+          id="project-detail-container">
         <div class="container">
             <div class="layout flex flex-col md:flex-row">
                 <!-- Sidebar -->
@@ -45,65 +47,85 @@
                              alt="portfolio thumbnail" />
                     </div>
                     <a href="{% url 'profile_detail' project.owner.id %}"
+                       hx-target="#project-detail-container"
+                       hx-swap="outerHTML show:window:top"
                        class="text-[1.6rem] font-medium text-main hover:underline">{{ project.owner.name }}</a>
                     <h2 class="text-[3.6rem] font-bold text-sub mb-[2rem] mt-[0.5rem] leading-tight">{{ project.title|title }}</h2>
-
-                    <div class="card p-[3rem] mb-[3rem]">
-                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">About the Project</h3>
-                        <div class="text-[1.5rem] leading-[1.7] text-text/80">{{ project.description|linebreaksbr }}</div>
-                    </div>
-
-                    <!-- Feedback Section -->
-                    <div class="card p-[3rem]">
-                        <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1rem]">Feedback</h3>
-                        <p class="mb-[2rem] text-[1.5rem] text-text/70">
-                            <span class="font-bold text-sub text-[1.8rem]">{{ project.vote_ratio }}%</span>
-                            Positive Feedback
-                            ({{ project.vote_total }} Votes)
-                        </p>
-                        {% if request.user.is_authenticated and request.user.profile.id == project.owner.id %}
-                            <p class="text-text/60 italic">You cannot review your own work</p>
-                        {% elif request.user.is_authenticated and request.user.profile.id in reviewers %}
-                            <p class="text-success font-medium">Thanks for your review</p>
-                        {% elif request.user.is_authenticated == False %}
-                            <p>
-                                <a href="{% url 'login' %}?next={{ request.path }}" class="text-main font-medium hover:underline">Login to leave a review</a>
+                    <!-- Grid: About + Feedback side by side -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-[2rem]">
+                        <!-- About the Project -->
+                        <div class="card p-[3rem]">
+                            <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">About the Project</h3>
+                            <div class="text-[1.5rem] leading-[1.7] text-text/80">{{ project.description|linebreaksbr }}</div>
+                        </div>
+                        <!-- Feedback Section -->
+                        {% partialdef feedback-partial inline %}
+                        <div class="card p-[3rem]" id="feedback">
+                            <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1rem]">Feedback</h3>
+                            <p class="mb-[2rem] text-[1.5rem] text-text/70">
+                                <span class="font-bold text-sub text-[1.8rem]">{{ project.vote_ratio }}%</span>
+                                Positive Feedback
+                                ({{ project.vote_total }} Votes)
                             </p>
-                        {% else %}
-                            <form class="form" action="" method="POST">
-                                {% csrf_token %}
-                                {% for field in review_form %}
-                                    <div class="form__field">
-                                        <label for="formInput#textarea">{{ field.label }}</label>
-                                        {{ field }}
-                                    </div>
-                                {% endfor %}
-                                <input class="btn btn--sub text-[1.4rem] mt-4" type="submit" value="Post Comment" />
-                            </form>
+                            {% if request.user.is_authenticated and request.user.profile.id == project.owner.id %}
+                                <p class="text-text/60 italic">You cannot review your own work</p>
+                            {% elif has_reviewed %}
+                                <p class="text-success font-medium">Thanks for your review</p>
+                            {% elif request.user.is_authenticated == False %}
+                                <p>
+                                    <a href="{% url 'login' %}?next={{ request.path }}"
+                                       class="text-main font-medium hover:underline">Login to leave a review</a>
+                                </p>
+                            {% else %}
+                                {% partialdef review-form-partial inline %}
+                                <div id="review-form-container">
+                                    <form class="form"
+                                          hx-post="{% url 'project_detail' project.id %}"
+                                          hx-target="#feedback"
+                                          hx-swap="outerHTML">
+                                        {% for field in review_form %}
+                                            <div class="form__field">
+                                                <label for="formInput#textarea">{{ field.label }}</label>
+                                                {{ field }}
+                                                {% for error in field.errors %}
+                                                    <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endfor %}
+                                        <input class="btn btn--sub text-[1.4rem] mt-4"
+                                               type="submit"
+                                               value="Post Comment" />
+                                    </form>
+                                </div>
+                            {% endpartialdef %}
                         {% endif %}
-
                         <!-- Comments List -->
-                        <div class="mt-[3rem] space-y-[2.5rem]">
-                            {% for review in project.review_set.all %}
-                                {% if review.body %}
-                                    <div class="flex gap-[1.5rem] p-[1.5rem] rounded-xl bg-bg/60 hover:bg-bg transition-colors duration-200">
-                                        <a href="{% url 'profile_detail' review.owner.id %}" class="shrink-0">
-                                            <img class="w-[4.5rem] h-[4.5rem] rounded-full object-cover ring-2 ring-main/10 ring-offset-1"
-                                                 src="{{ review.owner.profile_image.url }}"
+                        <div class="mt-[3rem] space-y-[2rem]" id="comments-list">
+                            {% for reviewer in reviewers %}
+                                {% if reviewer.body %}
+                                    <div class="flex gap-[1.5rem] p-[1.2rem] rounded-xl bg-bg/60 hover:bg-bg transition-colors duration-200">
+                                        <a href="{% url 'profile_detail' reviewer.owner.id %}"
+                                           class="flex items-center gap-[1.5rem] min-w-0 flex-1"
+                                           hx-target="#project-detail-container"
+                                           hx-swap="outerHTML show:window:top">
+                                            <img class="w-[4rem] h-[4rem] rounded-full object-cover ring-2 ring-main/10 ring-offset-1 shrink-0"
+                                                 src="{{ reviewer.owner.profile_image.url }}"
                                                  alt="user" />
+                                            <div class="min-w-0">
+                                                <span class="text-[1.5rem] font-semibold text-sub hover:text-main transition-colors block">{{ reviewer.owner.name }}</span>
+                                                <p class="text-[1.35rem] mt-[0.4rem] text-text/70 leading-[1.5]">{{ reviewer.body|linebreaksbr }}</p>
+                                            </div>
                                         </a>
-                                        <div>
-                                            <a href="{% url 'profile_detail' review.owner.id %}"
-                                               class="text-[1.6rem] font-semibold text-sub hover:text-main transition-colors">{{ review.owner.name }}</a>
-                                            <p class="text-[1.4rem] mt-[0.5rem] text-text/70 leading-[1.5]">{{ review.body|linebreaksbr }}</p>
-                                        </div>
                                     </div>
                                 {% endif %}
                             {% endfor %}
                         </div>
                     </div>
-                </div>
+                {% endpartialdef %}
             </div>
         </div>
-    </main>
+    </div>
+</div>
+</main>
+{% endpartialdef %}
 {% endblock content %}

@@ -2,15 +2,16 @@
 {% load static %}
 {% block content %}
   <!-- Main Section -->
-  <main class="my-[6rem] animate-fade-in">
+   {% partialdef message-detail-partial inline %}
+  <main class="my-[6rem] animate-fade-in" id="message-detail-partial">
     <div class="content-box">
-      <a class="back-btn mb-[2.5rem]" href="{% url 'inbox' %}"><i class="im im-angle-left"></i></a>
+      <a class="back-btn mb-[2.5rem]" href="{% url 'inbox' %}" hx-target="#message-detail-partial" hx-swap="outerHTML show:window:top"><i class="im im-angle-left"><</i></a>
       <h2 class="text-[2.6rem] text-sub font-bold mb-[1rem] leading-tight">
         {{ message.subject }}
       </h2>
       <div class="flex items-center gap-[1rem] mb-[1rem]">
         {% if message.sender %}
-          <a href="{% url 'profile_detail' message.sender.id %}"
+          <a href="{% url 'profile_detail' message.sender.id %}" hx-target="#message-detail-partial" hx-swap="outerHTML show:window:top"
              class="text-[1.5rem] font-semibold text-main hover:underline">{{ message.sender.name }}</a>
         {% else %}
           <span class="text-[1.5rem] font-medium text-sub">{{ message.name }}</span>
@@ -22,4 +23,5 @@
       <div class="border-t border-light/60 pt-[3rem] text-[1.5rem] leading-[1.7] text-text/80">{{ message.body|linebreaksbr }}</div>
     </div>
   </main>
+  {% endpartialdef %}
 {% endblock content %}

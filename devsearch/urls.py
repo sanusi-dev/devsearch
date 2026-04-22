@@ -3,20 +3,19 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from users.views import CustomLoginView, CustomSignupView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('projects.urls')),
-    path('', include('users.urls')),
+    path("admin/", admin.site.urls),
 
-    path('reset_password/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    # Override allauth's POST handlers
+    path("accounts/login/", CustomLoginView.as_view(), name="account_login"),
+    path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
 
-    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    
-    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path("accounts/", include("allauth.urls")),
+    path("", include("projects.urls")),
+    path("", include("users.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

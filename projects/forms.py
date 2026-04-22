@@ -15,7 +15,10 @@ class ProjectForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'input'})
+            if name == 'tags':
+                field.widget.attrs.update({'class': 'hidden peer'})
+            else:
+                field.widget.attrs.update({'class': 'input'})
 
     def clean_source_link(self):
         url = self.cleaned_data.get('source_link')

@@ -1,33 +1,51 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
+    {% partialdef send-message-partial inline %}
     <!-- Main Section -->
-    <main class="my-[8rem] animate-fade-in">
+    <main class="my-[8rem] animate-fade-in" id="form-container">
         <div class="content-box">
-            <a class="back-btn" href="{% url 'profile_detail' pk=recipient.id %}"><i class="im im-angle-left"></i></a>
+            <a class="btn btn--transparent text-[1.4rem]"
+               href="{% url 'profile_detail' pk=recipient.id %}"
+               hx-target="#form-container"
+               hx-swap="outerHTML show:window:top">&#x2190 Go Back</a>
             <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Send Message</h3>
             <p class="text-text/60 mb-[2rem] text-[1.4rem]">Write a message to {{ recipient.name }}.</p>
-            <form class="form" method="post">
-                {% csrf_token %}
+            <form class="form"
+                  hx-post="{% url 'send_message' pk=recipient.id %}"
+                  hx-target="#form-container"
+                  hx-swap="outerHTML">
                 {% if request.user.is_authenticated %}
                     <div class="form__field">
                         <label for="formInput#text">{{ message_form.subject.label }}</label>
                         {{ message_form.subject }}
+                        {% for error in message_form.subject.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
                     </div>
                     <div class="form__field">
                         <label for="formInput#text">{{ message_form.body.label }}</label>
                         {{ message_form.body }}
+                        {% for error in message_form.body.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
                     </div>
                 {% else %}
                     {% for field in message_form %}
                         <div class="form__field">
                             <label for="formInput#text">{{ field.label }}</label>
                             {{ field }}
+                            {% for error in field.errors %}
+                                <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                            {% endfor %}
                         </div>
                     {% endfor %}
                 {% endif %}
-                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Send Message" />
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]"
+                       type="submit"
+                       value="Send Message" />
             </form>
         </div>
     </main>
+{% endpartialdef %}
 {% endblock content %}

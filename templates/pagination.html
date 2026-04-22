@@ -5,6 +5,10 @@
             {% if page_obj.has_previous %}
                 <li>
                     <a href="?page={{ page_obj.previous_page_number }}&search_query={{ search_query }}"
+                       hx-get="?page={{ page_obj.previous_page_number }}&search_query={{ search_query }}"
+                       hx-target="#list-container"
+                       hx-swap="outerHTML"
+                       hx-push-url="true"
                        class="btn btn--transparent text-[1.4rem]">&#10094; Prev</a>
                 </li>
             {% endif %}
@@ -14,6 +18,10 @@
             {% if page_obj.has_next %}
                 <li>
                     <a href="?page={{ page_obj.next_page_number }}&search_query={{ search_query }}"
+                       hx-get="?page={{ page_obj.next_page_number }}&search_query={{ search_query }}"
+                       hx-target="#list-container"
+                       hx-swap="outerHTML"
+                       hx-push-url="true"
                        class="btn btn--transparent text-[1.4rem]">Next &#10095;</a>
                 </li>
             {% endif %}

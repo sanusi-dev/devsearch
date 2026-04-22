@@ -3,8 +3,8 @@ from .views import *
 
 
 urlpatterns = [
-    path('login/', auth_view, name='login'),
-    path('signup/', auth_view, name='signup'),
+    path('login/', login_view, name='login'),
+    path('signup/', signup_view, name='signup'),
     path('', logout_user, name='logout_user'),
 
     path('account/', user_account, name='account'),
@@ -16,8 +16,8 @@ urlpatterns = [
     path('message/<str:pk>', message, name='message'),
     path('send_message/to/<str:pk>', send_message, name='send_message'),
 
-    path('create_skill/', create_skill, name='create_skill'),
-    path('update_skill/<str:pk>/', update_skill, name='update_skill'),
+    path('create_skill/', skill_form, name='create_skill'),
+    path('update_skill/<str:pk>/', skill_form, name='update_skill'),
     path('delete_skill/<str:pk>/', delete_skill, name='delete_skill'),
 
 ]

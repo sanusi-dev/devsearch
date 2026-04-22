@@ -1,22 +1,36 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
+    {% partialdef profile-form-partial inline %}
     <!-- Main Section -->
-    <main class="my-[8rem] animate-fade-in">
+    <main class="my-[8rem] animate-fade-in" id="form-container">
         <div class="content-box">
-            <a class="back-btn" href="{% url 'account' %}"><i class="im im-angle-left"></i></a>
+            <a class="btn btn--transparent text-[1.4rem]" href="{% url 'account' %}"
+            hx-target="#form-container"
+            hx-swap="outerHTML show:window:top"
+            >&#x2190 Go Back</a>
             <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Edit Profile</h3>
             <p class="text-text/60 mb-[2rem] text-[1.4rem]">Update your profile information below.</p>
-            <form class="form" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+            <form class="form"
+                  hx-post="{% url 'profile_edit' %}"
+                  hx-target="#form-container"
+                  hx-swap="outerHTML show:window:top"
+                  hx-encoding="multipart/form-data"
+                  hx-push-url="true">
                 {% for field in profile_form %}
                     <div class="form__field">
                         <label for="formInput#text">{{ field.label }}</label>
                         {{ field }}
+                        {% for error in field.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
                     </div>
                 {% endfor %}
-                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Save Changes" />
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]"
+                       type="submit"
+                       value="Save Changes" />
             </form>
         </div>
     </main>
+{% endpartialdef %}
 {% endblock content %}

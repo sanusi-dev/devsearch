@@ -2,7 +2,8 @@
 {% load static %}
 {% block content %}
     <!-- Main Section -->
-    <main class="my-[6rem] animate-fade-in">
+     {% partialdef inbox-partial inline %}
+    <main class="my-[6rem] animate-fade-in" id="inbox-partial">
         <div class="content-box">
             <div class="flex items-center justify-between mb-[3rem]">
                 <h3 class="uppercase text-[2.2rem] font-bold text-sub tracking-wider">
@@ -14,7 +15,7 @@
                 {% for message in profile.messages.all %}
                     {% if message.is_read %}
                         <li>
-                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl transition-all duration-200 hover:bg-bg group">
+                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl transition-all duration-200 hover:bg-bg group" hx-target="#inbox-partial" hx-swap="outerHTML show:window:top">
                                 <span class="basis-[25%] font-medium text-text/60 group-hover:text-sub transition-colors text-[1.45rem]">{{ message.name }}</span>
                                 <span class="basis-[50%] text-text/50 text-[1.4rem]">{{ message.subject }}</span>
                                 <span class="basis-[25%] text-right text-text/40 text-[1.3rem]">{{ message.created_at }}</span>
@@ -22,7 +23,7 @@
                         </li>
                     {% else %}
                         <li>
-                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl bg-main/[0.04] border border-main/10 transition-all duration-200 hover:bg-main/[0.08] group">
+                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl bg-main/[0.04] border border-main/10 transition-all duration-200 hover:bg-main/[0.08] group" hx-target="#inbox-partial" hx-swap="outerHTML show:window:top">
                                 <span class="basis-[25%] font-bold text-sub text-[1.45rem]">{{ message.name }}</span>
                                 <span class="basis-[50%] font-semibold text-sub text-[1.4rem]">{{ message.subject }}</span>
                                 <span class="basis-[25%] text-right text-text/50 text-[1.3rem]">{{ message.created_at }}</span>
@@ -33,4 +34,5 @@
             </ul>
         </div>
     </main>
+    {% endpartialdef %}
 {% endblock content %}

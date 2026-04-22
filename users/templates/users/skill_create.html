@@ -1,22 +1,41 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
+    {% partialdef skill-form-partial inline %}
     <!-- Main Section -->
-    <main class="my-[8rem] animate-fade-in">
+    <main class="my-[8rem] animate-fade-in" id="form-container">
         <div class="content-box">
-            <a class="back-btn" href="{% url 'account' %}"><i class="im im-angle-left"></i></a>
-            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Add Skill</h3>
+            <a class="back-btn"
+               href="{% url 'account' %}"
+               hx-target="#form-container"
+               hx-swap="outerHTML show:window:top"><i class="im im-angle-left"><</i></a>
+            <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">{{ form_title|default:"Add Skill" }}</h3>
             <p class="text-text/60 mb-[2rem] text-[1.4rem]">Add a new skill to your developer profile.</p>
-            <form class="form" method="post">
+            <form class="form"
+                  method="post"
+                  {% if skill %}
+                      hx-post="{% url 'update_skill' skill.id %}"
+                  {% else %}
+                      hx-post="{% url 'create_skill' %}"
+                  {% endif %}
+                  hx-target="#form-container"
+                  hx-swap="outerHTML"
+                  hx-push-url="true">
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="form__field">
                         <label for="formInput#text">{{ field.label }}</label>
                         {{ field }}
+                        {% for error in field.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
                     </div>
                 {% endfor %}
-                <input class="btn btn--sub text-[1.4rem] my-[2rem]" type="submit" value="Save Skill" />
+                <input class="btn btn--sub text-[1.4rem] my-[2rem]"
+                       type="submit"
+                       value="Save" />
             </form>
         </div>
     </main>
+{% endpartialdef %}
 {% endblock content %}

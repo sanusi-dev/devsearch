@@ -1,28 +1,5 @@
-from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .models import *
-
-
-
-class UserRegistrationForm(UserCreationForm):
-    name = forms.CharField()
-    email = forms.EmailField()
-
-    class Meta(UserCreationForm.Meta):
-        fields = UserCreationForm.Meta.fields + ('email', 'name')
-
-    
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        return email.lower()
-    
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        return name.lower()
-    
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        return username.lower()
 
 class ProfileForm(forms.ModelForm):
     class Meta:
