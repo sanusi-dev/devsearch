@@ -117,10 +117,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Media files (user-uploaded content: profile pictures, project images, etc.)
+# All uploads are stored inside static/images/ — this keeps the existing files
+# working without migration. For production, move uploads to a dedicated
+# object storage bucket (e.g. S3) and update MEDIA_ROOT/MEDIA_URL accordingly.
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "static" / "images"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

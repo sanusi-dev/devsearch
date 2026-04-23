@@ -2,25 +2,22 @@
 
 **A Developer Talent Marketplace — built with Django, HTMX, and Tailwind CSS**
 
-DevSearch is a full-stack web platform where developers can showcase their portfolios and clients can discover and connect with technical talent. It features dynamic, SPA-like navigation without a JavaScript framework, a real-time email notification pipeline, GitHub OAuth, and a polished dark-mode UI.
+DevSearch is a full-stack web platform where developers can showcase their portfolios and clients can discover and connect with technical talent. It features dynamic, SPA-like navigation without a JavaScript framework, a real-time email notification pipeline, GitHub OAuth, and a polished, responsive UI.
 
-> **Origin:** This project started as a follow-along of Dennis Ivy's Django course on Udemy. After completing the tutorial I significantly extended the codebase — adding HTMX-powered partial rendering, GitHub social login, a queued email system with background workers, SweetAlert2 confirmation modals, dark mode, a custom messaging middleware, and more. The tutorial provided the data model foundation; everything beyond CRUD is original work.
+> **Origin:** This project started as a follow-along of Dennis Ivy's Django course on Udemy. After completing the tutorial I significantly extended the codebase — adding HTMX-powered partial rendering, GitHub social login, a queued email system with background workers, SweetAlert2 confirmation modals, a custom messaging middleware, and more. The tutorial provided the data model foundation; everything beyond CRUD is original work.
 
 ---
 
 ## 📸 Screenshots
 
-### Developer Profiles
-![Devsearch Home](https://github.com/user-attachments/assets/f6a75330-a46b-4f00-8ad4-65a127d7e466)
+> *Screenshots coming soon. A full walkthrough video will also be added here.*
 
-### Project Showcase
-![DevSearch Projects](https://github.com/user-attachments/assets/3a2c6a72-daaf-4f45-a416-24a4add82829)
-
-### Developer Portfolio Page
-![Devsearch Profile](https://github.com/user-attachments/assets/1b198682-b422-4d11-9fcf-3f8554315d23)
-
-### Inbox
-<img width="1273" height="518" alt="Devsearch Inbox" src="https://github.com/user-attachments/assets/bfc74987-22ed-4c8d-876c-c41c7c57401d" />
+| Page | Preview |
+|---|---|
+| Developer Profiles | *(screenshot placeholder)* |
+| Project Showcase | *(screenshot placeholder)* |
+| Developer Portfolio | *(screenshot placeholder)* |
+| Inbox | *(screenshot placeholder)* |
 
 ---
 
@@ -51,7 +48,6 @@ DevSearch is a full-stack web platform where developers can showcase their portf
 | **Welcome Emails** | HTML + plaintext transactional welcome emails sent on signup, with personalised content based on whether the user signed up via email or GitHub. |
 | **SweetAlert2 Modals** | All destructive actions (delete project, delete message, delete skill) trigger a confirmation modal instead of a separate confirmation page — no extra views or templates required. |
 | **Toast Notifications** | Django's messages framework is serialised to JSON and surfaced as SweetAlert2 toasts — works seamlessly for both standard page loads and HTMX partial swaps via a custom `HtmxMessageMiddleware`. |
-| **Dark Mode** | Full dark mode implementation with persistent preference stored in `localStorage`. Smooth transitions throughout. |
 | **Database-Level Constraints** | A `CheckConstraint` on the `Message` model prevents a user from messaging themselves at the database level, not just the application level. |
 | **Auto-complete URL Normalisation** | The project form automatically prepends `https://` to bare URLs entered by users, preventing broken links. |
 | **Improved Admin** | All models use the `@admin.register` decorator pattern with `list_display`, `search_fields`, and `list_filter` configurations for immediate usability. |

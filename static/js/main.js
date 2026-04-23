@@ -115,8 +115,8 @@ window.confirmAction = function(element, options = {}) {
             actions: 'mt-[2rem]',
             popup: 'rounded-3xl p-[2rem]',
         },
-        background: document.documentElement.classList.contains('dark') ? '#252b38' : '#fff',
-        color: document.documentElement.classList.contains('dark') ? '#e8edf5' : '#545454',
+        background: '#fff',
+        color: '#545454',
     }).then((result) => {
         if (result.isConfirmed) {
             // If confirmed, trigger the HTMX request
