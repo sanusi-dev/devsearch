@@ -1,8 +1,14 @@
+# Core
 Django==6.0.4
-django-allauth[socialaccount]==65.16.1
-django-htmx==1.27.0
-django-mailer==2.3.2
-pillow==11.3.0
+Pillow==11.3.0
 python-decouple==3.8
-django-crispy-forms==2.4
+
+# Authentication
+django-allauth[socialaccount]==65.16.1
+
+# Frontend / templates
+django-htmx==1.27.0
 django-widget-tweaks==1.5.0
+
+# Email queue
+django-mailer==2.3.2

@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django_htmx.http import HttpResponseClientRedirect, push_url
-from .models import *
-from .forms import *
+
+from .models import Project, Review, Tag
+from .forms import ProjectForm, ReviewForm
 from .utils import search_projects, pagination
 
 
@@ -17,13 +17,9 @@ def project_list(request):
     if request.htmx:
         target = request.htmx.target
         if target == "main-content":
-            return render(
-                request, "projects/project_list.html#project-list-main", context
-            )
+            return render(request, "projects/project_list.html#project-list-main", context)
         if target == "list-container":
-            return render(
-                request, "projects/project_list.html#project-list-partial", context
-            )
+            return render(request, "projects/project_list.html#project-list-partial", context)
 
     return render(request, "projects/project_list.html", context)
 
@@ -45,11 +41,11 @@ def project_detail(request, pk):
             review.owner = request.user.profile
             review.project = project
             review.save()
-            messages.success(request, 'Review submitted successfully!')
+            messages.success(request, "Review submitted successfully!")
 
-            # Re-fetch after save so the new review is included
+            # Re-fetch after save so the new review is included in context.
             reviewers = project.review_set.select_related("owner").all()
-            has_reviewed = True  # they just reviewed, no need to query again
+            has_reviewed = True
 
             if request.htmx:
                 context = {
@@ -58,24 +54,19 @@ def project_detail(request, pk):
                     "reviewers": reviewers,
                     "has_reviewed": has_reviewed,
                 }
-                return render(
-                    request, "projects/project_detail.html#feedback-partial", context
-                )
+                return render(request, "projects/project_detail.html#feedback-partial", context)
 
             return redirect("project_detail", pk=project.id)
 
-        else:
-            # On validation error, re-render just the form partial
-            if request.htmx:
-                context = {
-                    "project": project,
-                    "review_form": review_form,
-                    "reviewers": reviewers,
-                    "has_reviewed": has_reviewed,
-                }
-                return render(
-                    request, "projects/project_detail.html#review-form-partial", context
-                )
+        # Validation errors — re-render the review form partial for HTMX requests.
+        if request.htmx:
+            context = {
+                "project": project,
+                "review_form": review_form,
+                "reviewers": reviewers,
+                "has_reviewed": has_reviewed,
+            }
+            return render(request, "projects/project_detail.html#review-form-partial", context)
 
     context = {
         "project": project,
@@ -85,9 +76,7 @@ def project_detail(request, pk):
     }
 
     if request.htmx:
-        return render(
-            request, "projects/project_detail.html#project-detail-partial", context
-        )
+        return render(request, "projects/project_detail.html#project-detail-partial", context)
 
     return render(request, "projects/project_detail.html", context)
 
@@ -109,34 +98,21 @@ def project_form(request, pk=None):
             new_project = form.save(commit=False)
             new_project.owner = profile
             new_project.save()
-            form.save_m2m()  # Ensure many-to-many fields (like tags) are saved
-            
+            form.save_m2m()  # Persist many-to-many fields (tags).
+
             action = "updated" if pk else "created"
             messages.success(request, f"Project '{new_project.title}' {action} successfully!")
-
             return redirect("account")
 
-        # Validation errors — re-render the form partial with errors
+        # Validation errors — re-render the form partial for HTMX requests.
         if request.htmx:
-            context = {
-                "form": form,
-                "project": project,
-                "form_title": form_title,
-            }
-            return render(
-                request,
-                "projects/project_create.html#project-form-partial",
-                context,
-            )
+            context = {"form": form, "project": project, "form_title": form_title}
+            return render(request, "projects/project_create.html#project-form-partial", context)
 
     context = {"form": form, "project": project, "form_title": form_title}
 
     if request.htmx:
-        return render(
-            request,
-            "projects/project_create.html#project-form-partial",
-            context,
-        )
+        return render(request, "projects/project_create.html#project-form-partial", context)
 
     return render(request, "projects/project_create.html", context)
 

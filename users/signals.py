@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,7 +9,7 @@ from django.template.loader import render_to_string
 
 from allauth.account.signals import user_signed_up
 
-from .models import *
+from .models import Profile
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ def create_profile(sender, instance, created, *args, **kwargs):
     """
     if created:
         user = instance
-        # Build a sensible display name from whatever is available
+        # Build a sensible display name from whatever is available.
         name = (
             getattr(user, "name", "")
             or f"{user.first_name} {user.last_name}".strip()
@@ -73,7 +74,7 @@ def send_welcome_email(profile):
     subject = "Welcome to DevSearch!"
     context = {
         "profile": profile,
-        "signup_method": profile.signup_method or "Email"
+        "signup_method": profile.signup_method or "Email",
     }
 
     text_body = render_to_string("users/welcome_email.txt", context)
@@ -95,9 +96,10 @@ def send_welcome_email(profile):
 
 @receiver(post_save, sender=Profile)
 def update_user(instance, created, *args, **kwargs):
-    profile = instance
-    user = profile.user
-    if created == False:
+    """Keep the Django User record in sync when a Profile is updated."""
+    if not created:
+        profile = instance
+        user = profile.user
         user.username = profile.username
         user.email = profile.email
         user.save()

@@ -1,4 +1,4 @@
-# Environment variables
+# Environment variables — never commit the real .env
 .env
 .env.local
 .env.production
@@ -14,6 +14,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.venv/
 
 # Django
 *.log
@@ -31,31 +32,23 @@ media/
 # OS
 .DS_Store
 Thumbs.db
-.venv
 
 # Node
 node_modules/
 
-# Tailwind
+# Tailwind — the compiled output is generated, not authored
 static/styles/output.css
 
-# Django Static
+# Django collected static (production build artefact)
 staticfiles/
 static_root/
 
-# Node Configs
-package.json
-package-lock.json
-
-# Tailwind Config
-tailwind.config.js
-
-# Agent
+# Agent workspace
 .agent/
 
-# Seed Generated Images
+# Seed / test images
 static/images/profilepic.jpg
 static/images/profiles/profilepic.jpg
 
-# Mailer Locks
+# django-mailer lock files created by the background worker process
 linux-pc-*

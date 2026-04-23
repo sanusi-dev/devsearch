@@ -1,13 +1,24 @@
 from pathlib import Path
 import os
-from decouple import config  
+from decouple import config, Csv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------------------------------------------------------------------
+# Core
+# ---------------------------------------------------------------------------
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-ALLOWED_HOSTS = []
 
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default=False, cast=bool)
 
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
+
+# The public-facing URL of this site — used to build absolute links in emails.
+SITE_URL = config("SITE_URL", default="http://127.0.0.1:8000")
+
+# ---------------------------------------------------------------------------
 # Application definition
+# ---------------------------------------------------------------------------
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -69,9 +80,9 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-
+# ---------------------------------------------------------------------------
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# ---------------------------------------------------------------------------
 
 DATABASES = {
     "default": {
@@ -80,46 +91,43 @@ DATABASES = {
     }
 }
 
-
+# ---------------------------------------------------------------------------
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# ---------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# ---------------------------------------------------------------------------
+# Internationalisation
+# ---------------------------------------------------------------------------
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# ---------------------------------------------------------------------------
+# Static & media files
+# ---------------------------------------------------------------------------
 
 STATIC_URL = "static/"
-MEDIA_URL = ""
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-SECRET_KEY = config("SECRET_KEY")
-DEBUG= config("DEBUG", default=False, cast=bool)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ---------------------------------------------------------------------------
+# Email configuration
+# ---------------------------------------------------------------------------
+
 if DEBUG:
     EMAIL_HOST = config("DEV_EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
     EMAIL_HOST_USER = config("DEV_EMAIL_USER")
@@ -134,44 +142,30 @@ else:
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
-MEDIA_ROOT = BASE_DIR / "static/images"
+# Use django-mailer to queue emails in the database.
+# The background worker (run_mailer.sh) dispatches them via the SMTP backend below.
+EMAIL_BACKEND = "mailer.backend.DbBackend"
+MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ---------------------------------------------------------------------------
-# Email Configuration
-# ---------------------------------------------------------------------------
-# MAILER_EMPTY_QUEUE_SLEEP = 5
-if DEBUG:
-    # Use django-mailer even in dev so we can test background automation
-    # Emails will be sent to your actual Gmail address.
-    EMAIL_BACKEND = "mailer.backend.DbBackend"
-    MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-else:
-    # Production: Use django-mailer queue
-    EMAIL_BACKEND = "mailer.backend.DbBackend"
-    MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# How long (seconds) the background worker sleeps when the queue is empty.
+MAILER_EMPTY_QUEUE_SLEEP = 30
 
 # ---------------------------------------------------------------------------
 # django-allauth configuration
 # ---------------------------------------------------------------------------
 
-# Account (email + password) settings
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
-# Social account settings
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-# Redirect URLs
 LOGIN_REDIRECT_URL = "/profiles/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
 LOGIN_URL = "/login/"
 
-# GitHub provider — credentials from environment
+# GitHub OAuth — credentials supplied via environment variables.
 SOCIALACCOUNT_PROVIDERS = {
     "github": {
         "SCOPE": ["user:email"],

@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -10,8 +9,8 @@ from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.views import LoginView, SignupView
 from django_htmx.http import retarget
 
-from .models import *
-from .forms import *
+from .models import Profile, Skill, Message
+from .forms import ProfileForm, SkillForm, MessageForm
 from .utils import search_profiles
 from projects.utils import pagination
 
@@ -19,35 +18,34 @@ from projects.utils import pagination
 def signup_view(request):
     if request.user.is_authenticated:
         return redirect("profile_list")
-    
-    context = {
-        "form": SignupForm(),
-    }
-    
+
+    context = {"form": SignupForm()}
+
     if request.htmx:
         return render(request, "account/signup.html#signup-form-partial", context)
-    
+
     return render(request, "account/signup.html", context)
+
 
 def login_view(request):
     if request.user.is_authenticated:
         return redirect("profile_list")
-    
-    context = {
-        "form": LoginForm(),
-    }
+
+    context = {"form": LoginForm()}
 
     if request.htmx:
         return render(request, "account/login.html#login-form-partial", context)
-    
+
     return render(request, "account/login.html", context)
+
 
 def logout_user(request):
     logout(request)
     return redirect("login")
 
+
 class CustomLoginView(LoginView):
-    
+
     def form_invalid(self, form):
         if self.request.htmx:
             response = render(
@@ -58,6 +56,7 @@ class CustomLoginView(LoginView):
 
 
 class CustomSignupView(SignupView):
+
     def form_invalid(self, form):
         if self.request.htmx:
             response = render(
@@ -78,9 +77,7 @@ def profile_list(request):
         if target == "main-content":
             return render(request, "users/profile_list.html#profile-list-main", context)
         if target == "list-container":
-            return render(
-                request, "users/profile_list.html#profile-list-partial", context
-            )
+            return render(request, "users/profile_list.html#profile-list-partial", context)
 
     return render(request, "users/profile_list.html", context)
 
@@ -90,9 +87,7 @@ def profile_detail(request, pk):
     context = {"profile": profile}
 
     if request.htmx:
-        return render(
-            request, "users/profile_detail.html#profile-detail-partial", context
-        )
+        return render(request, "users/profile_detail.html#profile-detail-partial", context)
 
     return render(request, "users/profile_detail.html", context)
 
@@ -118,15 +113,13 @@ def profile_edit(request):
         )
         if profile_form.is_valid():
             profile_form.save()
-            messages.success(request, 'Profile updated successfully!')
+            messages.success(request, "Profile updated successfully!")
             return redirect("account")
 
-        # Validation errors — re-render form partial
+        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"profile_form": profile_form}
-            return render(
-                request, "users/profile_form.html#profile-form-partial", context
-            )
+            return render(request, "users/profile_form.html#profile-form-partial", context)
 
     context = {"profile_form": profile_form}
 
@@ -153,12 +146,10 @@ def skill_form(request, pk=None):
             messages.success(request, f"Skill '{new_skill.name}' {action} successfully!")
             return redirect("account")
 
-        # Validation errors — re-render form partial
+        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"form": form, "skill": skill, "form_title": form_title}
-            return render(
-                request, "users/skill_create.html#skill-form-partial", context
-            )
+            return render(request, "users/skill_create.html#skill-form-partial", context)
 
     context = {"form": form, "skill": skill, "form_title": form_title}
 
@@ -195,13 +186,13 @@ def inbox(request):
 @login_required(login_url="login")
 def message(request, pk):
     recipient = request.user.profile
-    message = get_object_or_404(Message, id=pk, recipient=recipient)
+    msg = get_object_or_404(Message, id=pk, recipient=recipient)
 
-    if not message.is_read:
-        message.is_read = True
-        message.save()
+    if not msg.is_read:
+        msg.is_read = True
+        msg.save()
 
-    context = {"message": message}
+    context = {"message": msg}
 
     if request.htmx:
         return render(request, "users/message.html#message-detail-partial", context)
@@ -211,10 +202,10 @@ def message(request, pk):
 
 @login_required(login_url="login")
 def delete_message(request, pk):
-    message = get_object_or_404(Message, id=pk, recipient=request.user.profile)
+    msg = get_object_or_404(Message, id=pk, recipient=request.user.profile)
 
     if request.method == "POST":
-        message.delete()
+        msg.delete()
         messages.success(request, "Message deleted successfully!")
         return redirect("inbox")
 
@@ -222,7 +213,6 @@ def delete_message(request, pk):
 
 
 def send_message(request, pk):
-
     recipient = get_object_or_404(Profile, id=pk)
     message_form = MessageForm()
 
@@ -236,16 +226,13 @@ def send_message(request, pk):
                 msg.email = request.user.profile.email
             msg.recipient = recipient
             msg.save()
-            messages.success(request, 'Message sent successfully!')
-
+            messages.success(request, "Message sent successfully!")
             return redirect("profile_detail", pk=recipient.id)
 
-        # Validation errors — re-render form partial
+        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"message_form": message_form, "recipient": recipient}
-            return render(
-                request, "users/send_message.html#send-message-partial", context
-            )
+            return render(request, "users/send_message.html#send-message-partial", context)
 
     context = {"message_form": message_form, "recipient": recipient}
 
@@ -262,8 +249,10 @@ def unsubscribe(request, signature):
         profile = get_object_or_404(Profile, id=profile_id)
         profile.receive_notifications = False
         profile.save()
-        messages.success(request, 'You have been successfully unsubscribed from email notifications.')
+        messages.success(
+            request, "You have been successfully unsubscribed from email notifications."
+        )
     except BadSignature:
-        messages.error(request, 'Invalid or expired unsubscribe link.')
-    
-    return redirect('login')
+        messages.error(request, "Invalid or expired unsubscribe link.")
+
+    return redirect("login")
