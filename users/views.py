@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.core.signing import Signer, BadSignature
 
 from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.views import LoginView, SignupView
@@ -117,6 +118,7 @@ def profile_edit(request):
         )
         if profile_form.is_valid():
             profile_form.save()
+            messages.success(request, 'Profile updated successfully!')
             return redirect("account")
 
         # Validation errors — re-render form partial
@@ -147,6 +149,8 @@ def skill_form(request, pk=None):
             new_skill = form.save(commit=False)
             new_skill.owner = profile
             new_skill.save()
+            action = "updated" if pk else "added"
+            messages.success(request, f"Skill '{new_skill.name}' {action} successfully!")
             return redirect("account")
 
         # Validation errors — re-render form partial
@@ -170,14 +174,10 @@ def delete_skill(request, pk):
 
     if request.method == "POST":
         skill.delete()
+        messages.success(request, f"Skill '{skill.name}' deleted successfully!")
         return redirect("account")
 
-    context = {"skill": skill}
-
-    if request.htmx:
-        return render(request, "users/delete.html#delete-confirm-partial", context)
-
-    return render(request, "users/delete.html", context)
+    return redirect("account")
 
 
 @login_required(login_url="login")
@@ -209,6 +209,18 @@ def message(request, pk):
     return render(request, "users/message.html", context)
 
 
+@login_required(login_url="login")
+def delete_message(request, pk):
+    message = get_object_or_404(Message, id=pk, recipient=request.user.profile)
+
+    if request.method == "POST":
+        message.delete()
+        messages.success(request, "Message deleted successfully!")
+        return redirect("inbox")
+
+    return redirect("inbox")
+
+
 def send_message(request, pk):
 
     recipient = get_object_or_404(Profile, id=pk)
@@ -224,6 +236,7 @@ def send_message(request, pk):
                 msg.email = request.user.profile.email
             msg.recipient = recipient
             msg.save()
+            messages.success(request, 'Message sent successfully!')
 
             return redirect("profile_detail", pk=recipient.id)
 
@@ -240,3 +253,17 @@ def send_message(request, pk):
         return render(request, "users/send_message.html#send-message-partial", context)
 
     return render(request, "users/send_message.html", context)
+
+
+def unsubscribe(request, signature):
+    signer = Signer()
+    try:
+        profile_id = signer.unsign(signature)
+        profile = get_object_or_404(Profile, id=profile_id)
+        profile.receive_notifications = False
+        profile.save()
+        messages.success(request, 'You have been successfully unsubscribed from email notifications.')
+    except BadSignature:
+        messages.error(request, 'Invalid or expired unsubscribe link.')
+    
+    return redirect('login')

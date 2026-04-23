@@ -56,3 +56,6 @@ tailwind.config.js
 # Seed Generated Images
 static/images/profilepic.jpg
 static/images/profiles/profilepic.jpg
+
+# Mailer Locks
+linux-pc-*

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django_htmx.http import HttpResponseClientRedirect, push_url
 from .models import *
 from .forms import *
@@ -44,6 +45,7 @@ def project_detail(request, pk):
             review.owner = request.user.profile
             review.project = project
             review.save()
+            messages.success(request, 'Review submitted successfully!')
 
             # Re-fetch after save so the new review is included
             reviewers = project.review_set.select_related("owner").all()
@@ -108,6 +110,9 @@ def project_form(request, pk=None):
             new_project.owner = profile
             new_project.save()
             form.save_m2m()  # Ensure many-to-many fields (like tags) are saved
+            
+            action = "updated" if pk else "created"
+            messages.success(request, f"Project '{new_project.title}' {action} successfully!")
 
             return redirect("account")
 
@@ -142,14 +147,7 @@ def delete_project(request, pk):
 
     if request.method == "POST":
         project.delete()
+        messages.success(request, f"Project '{project.title}' deleted successfully!")
+        return redirect("account")
 
-        if request.htmx:
-            # return HttpResponseClientRedirect(redirect_to=reverse("account"))
-            return redirect("account")
-
-    context = {"project": project}
-
-    if request.htmx:
-        return render(request, "projects/delete.html#delete-confirm-partial", context)
-
-    return render(request, "projects/delete.html", context)
+    return redirect("account")

@@ -3,7 +3,7 @@
 {% block content %}
     {% partialdef profile-list-main inline %}
     <main id="profile-list-container">
-        <!-- Hero Section: Gradient Mesh -->
+        <!-- Hero Section -->
         <section class="relative bg-sub flex items-center justify-center h-[38vh] text-center overflow-hidden">
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(90,165,185,0.3)_0%,transparent_60%)]"></div>
             <div class="relative z-10 container container--narrow animate-fade-in">
@@ -38,40 +38,64 @@
                 </div>
             </div>
         </section>
-        <!-- Developer List (HTMX partial target) -->
         {% partialdef profile-list-partial inline %}
         <div id="list-container">
             <section class="mt-[6rem] mb-[4rem]">
                 <div class="container">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[2.5rem]">
-                        {% for profile in page_obj %}
-                            <div class="card hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] animate-slide-up"
-                                 style="animation-delay: {{ forloop.counter0 }}00ms">
-                                <a href="{% url 'profile_detail' profile.id %}"
-                                   class="card__body block group h-full"
-                                   hx-target="#profile-list-container"
-                                   hx-swap="outerHTML show:window:top">
-                                    <div class="flex items-center gap-[1.5rem]">
-                                        <img class="avatar avatar--md"
-                                             src="{{ profile.profile_image.url }}"
-                                             alt="image" />
-                                        <div>
-                                            <h3 class="text-sub text-[2rem] font-bold group-hover:text-main transition-colors duration-200">{{ profile.name }}</h3>
-                                            <h5 class="text-text text-[1.4rem] font-medium">{{ profile.short_intro|slice:":60" }}</h5>
+                    {% if page_obj %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[2.5rem]">
+                            {% for profile in page_obj %}
+                                <div class="card hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] animate-slide-up"
+                                     style="animation-delay: {{ forloop.counter0 }}00ms">
+                                    <a href="{% url 'profile_detail' profile.id %}"
+                                       class="card__body block group h-full"
+                                       hx-target="#profile-list-container"
+                                       hx-swap="outerHTML show:window:top">
+                                        <div class="flex items-center gap-[1.5rem]">
+                                            <img class="avatar avatar--md"
+                                                 src="{{ profile.profile_image.url }}"
+                                                 alt="{{ profile.name }}" />
+                                            <div>
+                                                <h3 class="text-sub text-[2rem] font-bold group-hover:text-main transition-colors duration-200">{{ profile.name }}</h3>
+                                                {% if profile.short_intro %}
+                                                    <h5 class="text-text text-[1.4rem] font-medium">{{ profile.short_intro|slice:":60" }}</h5>
+                                                {% else %}
+                                                    <h5 class="text-text/30 text-[1.4rem] italic">No intro</h5>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <p class="my-[1.5rem] text-[1.35rem] leading-[1.5] text-text/80">{{ profile.bio|slice:":150" }}</p>
-                                    <div class="flex flex-wrap gap-2">
-                                        {% for skill in profile.skill_set.all %}
-                                            <span class="tag tag--pill tag--main">
-                                                <small>{{ skill|title }}</small>
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
+                                        {% if profile.bio %}
+                                            <p class="my-[1.5rem] text-[1.35rem] leading-[1.5] text-text/80">{{ profile.bio|slice:":150" }}</p>
+                                        {% else %}
+                                            <p class="my-[1.5rem] text-[1.35rem] text-text/30 italic">No bio available.</p>
+                                        {% endif %}
+                                        {% if profile.skill_set.all %}
+                                            <div class="flex flex-wrap gap-2">
+                                                {% for skill in profile.skill_set.all %}
+                                                    <span class="tag tag--pill tag--main"><small>{{ skill|title }}</small></span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <p class="text-[1.25rem] text-text/25 italic">No skills listed</p>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <!-- Empty search results state -->
+                        <div class="flex flex-col items-center justify-center py-[8rem] text-center">
+                            <i class="im im-users text-text/10 text-[5rem] mb-[1.5rem] block"></i>
+                            <h3 class="text-[2rem] font-bold text-sub/50 mb-[0.6rem]">No developers found</h3>
+                            <p class="text-[1.4rem] text-text/35 mb-[2rem]">
+                                No results for <span class="text-text/55 font-semibold">"{{ search_query }}"</span>. Try a different name or skill.
+                            </p>
+                            <a href="{% url 'profile_list' %}"
+                               class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
+                               hx-target="#profile-list-container"
+                               hx-swap="outerHTML show:window:top">Clear search</a>
+                        </div>
+                    {% endif %}
                 </div>
             </section>
             {% include "pagination.html" %}

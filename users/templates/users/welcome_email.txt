@@ -1,6 +1,6 @@
 Welcome to DevSearch, {{ profile.name }}!
 
-We're thrilled to have you join our community.
+We're thrilled to have you join our community via {{ signup_method }}.
 
 DevSearch is the perfect place to discover amazing developer projects, showcase your own work, and connect with peers around the globe.
 

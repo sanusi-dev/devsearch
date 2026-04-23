@@ -1,38 +1,85 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
-    <!-- Main Section -->
-     {% partialdef inbox-partial inline %}
+    {% partialdef inbox-partial inline %}
     <main class="my-[6rem] animate-fade-in" id="inbox-partial">
         <div class="content-box">
-            <div class="flex items-center justify-between mb-[3rem]">
-                <h3 class="uppercase text-[2.2rem] font-bold text-sub tracking-wider">
-                    Messages
-                </h3>
-                <span class="inline-flex items-center justify-center bg-main/10 text-main font-bold text-[1.4rem] rounded-full px-[1.5rem] py-[0.5rem]">{{ un_read }} unread</span>
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-[3.5rem]">
+                <div>
+                    <h3 class="text-[2.4rem] font-bold text-sub tracking-tight leading-none mb-[0.6rem]">Inbox</h3>
+                    <p class="text-[1.35rem] text-text/50">
+                        <span class="text-main font-bold">{{ un_read }}</span> unread message{{ un_read|pluralize }}
+                    </p>
+                </div>
+                <span class="text-[1.25rem] font-bold text-text/50 border border-light/60 rounded-full px-[1.6rem] py-[0.6rem]">
+                    {{ profile.messages.all.count }} Total
+                </span>
             </div>
-            <ul class="list-none space-y-[0.5rem]">
-                {% for message in profile.messages.all %}
-                    {% if message.is_read %}
+            <!-- Messages List -->
+            <div class="rounded-2xl border border-light/50 overflow-hidden">
+                <ul class="divide-y divide-light/40">
+                    {% for message in profile.messages.all %}
                         <li>
-                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl transition-all duration-200 hover:bg-bg group" hx-target="#inbox-partial" hx-swap="outerHTML show:window:top">
-                                <span class="basis-[25%] font-medium text-text/60 group-hover:text-sub transition-colors text-[1.45rem]">{{ message.name }}</span>
-                                <span class="basis-[50%] text-text/50 text-[1.4rem]">{{ message.subject }}</span>
-                                <span class="basis-[25%] text-right text-text/40 text-[1.3rem]">{{ message.created_at }}</span>
+                            <a href="{% url 'message' message.id %}"
+                               class="flex items-center gap-[2rem] px-[2.5rem] py-[2rem] transition-colors duration-150 hover:bg-bg/60 group
+                                      {% if not message.is_read %}bg-main/[0.04]{% endif %}"
+                               hx-target="#inbox-partial"
+                               hx-swap="outerHTML show:window:top">
+                                <!-- Avatar + unread dot -->
+                                <div class="relative shrink-0">
+                                    {% if message.sender %}
+                                        <img src="{{ message.sender.profile_image.url }}"
+                                             alt="{{ message.name }}"
+                                             class="avatar avatar--md" />
+                                    {% else %}
+                                        <div class="avatar avatar--md bg-light/50 flex items-center justify-center">
+                                            <i class="im im-user-male text-text/30 text-[2rem]"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if not message.is_read %}
+                                        <span class="absolute -top-[0.2rem] -right-[0.2rem] w-[1rem] h-[1rem] bg-main rounded-full border-2 border-white"></span>
+                                    {% endif %}
+                                </div>
+                                <!-- Text content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-[1rem] mb-[0.25rem]">
+                                        <span class="text-[1.5rem] font-bold
+                                                     {% if not message.is_read %}
+                                                         text-sub
+                                                     {% else %}
+                                                         text-sub/60
+                                                     {% endif %}
+                                                     truncate group-hover:text-main transition-colors duration-150">
+                                            {{ message.name }}
+                                        </span>
+                                        <span class="text-[1.15rem] text-text/35 font-medium whitespace-nowrap shrink-0">
+                                            {{ message.created_at|timesince }} ago
+                                        </span>
+                                    </div>
+                                    <p class="text-[1.35rem]
+                                              {% if not message.is_read %}
+                                                  text-sub/80 font-semibold
+                                              {% else %}
+                                                  text-text/50 font-normal
+                                              {% endif %}
+                                              truncate mb-[0.2rem]">{{ message.subject }}</p>
+                                    <p class="text-[1.25rem] text-text/40 truncate">{{ message.body|truncatechars:90 }}</p>
+                                </div>
+                                <!-- Arrow -->
+                                <i class="im im-angle-right text-main text-[1.6rem] opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0"></i>
                             </a>
                         </li>
-                    {% else %}
-                        <li>
-                            <a href="{% url 'message' message.id %}" class="flex gap-[2rem] p-[1.8rem] rounded-xl bg-main/[0.04] border border-main/10 transition-all duration-200 hover:bg-main/[0.08] group" hx-target="#inbox-partial" hx-swap="outerHTML show:window:top">
-                                <span class="basis-[25%] font-bold text-sub text-[1.45rem]">{{ message.name }}</span>
-                                <span class="basis-[50%] font-semibold text-sub text-[1.4rem]">{{ message.subject }}</span>
-                                <span class="basis-[25%] text-right text-text/50 text-[1.3rem]">{{ message.created_at }}</span>
-                            </a>
+                    {% empty %}
+                        <li class="py-[8rem] text-center">
+                            <i class="im im-mailbox text-text/10 text-[5rem] mb-[1.5rem] block"></i>
+                            <h3 class="text-[1.8rem] font-bold text-sub/60 mb-[0.4rem]">No messages yet</h3>
+                            <p class="text-[1.35rem] text-text/35">New messages will appear here.</p>
                         </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </main>
-    {% endpartialdef %}
+{% endpartialdef %}
 {% endblock content %}

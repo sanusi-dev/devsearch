@@ -15,9 +15,11 @@ urlpatterns = [
     path('inbox/', inbox, name='inbox'),
     path('message/<str:pk>', message, name='message'),
     path('send_message/to/<str:pk>', send_message, name='send_message'),
+    path('delete_message/<str:pk>', delete_message, name='delete_message'),
 
     path('create_skill/', skill_form, name='create_skill'),
     path('update_skill/<str:pk>/', skill_form, name='update_skill'),
     path('delete_skill/<str:pk>/', delete_skill, name='delete_skill'),
 
+    path('unsubscribe/<str:signature>/', unsubscribe, name='unsubscribe'),
 ]

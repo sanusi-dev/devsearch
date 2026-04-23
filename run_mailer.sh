@@ -5,5 +5,5 @@ while true; do
   .venv/bin/python manage.py send_mail
   
   # Wait for 10 seconds before checking for new emails again
-  sleep 5
+  sleep 20
 done

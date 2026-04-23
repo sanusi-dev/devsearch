@@ -11,7 +11,8 @@ class ProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'input'})
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'input'})
 
 class SkillForm(forms.ModelForm):
     class Meta:

@@ -12,60 +12,99 @@
                             <a class="tag tag--pill tag--main inline-block mb-[2.5rem]"
                                href="{% url 'profile_edit' %}"
                                hx-target="#account-container"
-                               hx-swap="outerHTML show:window:top"><i class="im im-edit"></i> Edit Profile</a>
+                               hx-swap="outerHTML show:window:top">
+                                <i class="im im-edit"></i> Edit Profile
+                            </a>
                             <img class="avatar avatar--xl block mx-auto"
                                  src="{{ profile.profile_image.url }}" />
                             <h2 class="text-sub text-[2.6rem] font-bold mt-[1.5rem] mb-[0.3rem]">{{ profile.name }}</h2>
-                            <p class="text-[1.5rem] font-medium text-text/70 leading-[1.4]">{{ profile.short_intro }}</p>
+                            {% if profile.short_intro %}
+                                <p class="text-[1.5rem] font-medium text-text/70 leading-[1.4]">{{ profile.short_intro }}</p>
+                            {% else %}
+                                <p class="text-[1.4rem] text-text/30 italic">No intro added yet</p>
+                            {% endif %}
                             <p class="mt-[0.8rem] text-[1.3rem] text-text/50 flex items-center justify-center gap-[0.5rem]">
-                                <i class="im im-location text-main/50"></i> Based in {{ profile.location }}
+                                <i class="im im-location text-main/50"></i>
+                                {% if profile.location %}
+                                    {{ profile.location }}
+                                {% else %}
+                                    <span class="text-text/30 italic">Location not set</span>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
                 </div>
                 <!-- Main Content -->
                 <div class="column column--2of3 order-1 md:order-2">
-                    <!-- Grid: About + Skills side by side -->
+                    <!-- Grid: About + Skills -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-[2rem] mb-[2.5rem]">
                         <!-- About -->
                         <div class="card p-[3rem]">
                             <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider mb-[1.5rem]">About Me</h3>
-                            <p class="text-[1.45rem] leading-[1.7] text-text/80">{{ profile.bio|linebreaksbr }}</p>
+                            {% if profile.bio %}
+                                <p class="text-[1.45rem] leading-[1.7] text-text/80">{{ profile.bio|linebreaksbr }}</p>
+                            {% else %}
+                                <div class="flex flex-col items-center justify-center py-[3rem] text-center">
+                                    <i class="im im-edit text-text/10 text-[3.5rem] mb-[1rem] block"></i>
+                                    <p class="text-[1.35rem] text-text/35 mb-[1.2rem]">You haven't written a bio yet.</p>
+                                    <a href="{% url 'profile_edit' %}"
+                                       class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
+                                       hx-target="#account-container"
+                                       hx-swap="outerHTML show:window:top">Add one now</a>
+                                </div>
+                            {% endif %}
                         </div>
-                        <!-- Skills Section -->
+                        <!-- Skills -->
                         <div class="card p-[3rem]">
                             <div class="flex justify-between items-center mb-[2rem]">
                                 <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider">Skills</h3>
                                 <a class="btn btn--main text-[1.2rem] py-[0.6rem] px-[1.8rem]"
                                    href="{% url 'create_skill' %}"
                                    hx-target="#account-container"
-                                   hx-swap="outerHTML show:window:top"><i class="im im-plus mr-1"></i> Add</a>
+                                   hx-swap="outerHTML show:window:top">
+                                    <i class="im im-plus mr-1"></i> Add
+                                </a>
                             </div>
-                            <div class="space-y-[0.5rem]">
-                                {% for skill in profile.skill_set.all %}
-                                    <div class="flex items-center justify-between p-[1.2rem] rounded-xl hover:bg-bg transition-colors duration-200 group">
-                                        <div class="flex-1 pr-[1.5rem] min-w-0">
-                                            <h4 class="text-[1.45rem] font-semibold text-sub truncate">{{ skill.name|title }}</h4>
-                                            {% if skill.description %}
-                                                <p class="text-[1.3rem] text-text/60 mt-[0.2rem] line-clamp-1">{{ skill.description|slice:"80" }}</p>
-                                            {% endif %}
+                            {% if profile.skill_set.all %}
+                                <div class="space-y-[0.5rem]">
+                                    {% for skill in profile.skill_set.all %}
+                                        <div class="flex items-center justify-between p-[1.2rem] rounded-xl hover:bg-bg transition-colors duration-200 group">
+                                            <div class="flex-1 pr-[1.5rem] min-w-0">
+                                                <h4 class="text-[1.45rem] font-semibold text-sub truncate">{{ skill.name|title }}</h4>
+                                                {% if skill.description %}
+                                                    <p class="text-[1.3rem] text-text/60 mt-[0.2rem] line-clamp-1">{{ skill.description|slice:"80" }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex gap-[0.5rem] opacity-40 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+                                                <a class="tag tag--pill tag--main text-[1.1rem]"
+                                                   href="{% url 'update_skill' skill.id %}"
+                                                   hx-target="#account-container"
+                                                   hx-swap="outerHTML show:window:top"><i class="im im-edit">update</i></a>
+                                                <button class="tag tag--pill bg-error/10 text-error hover:bg-error/20 text-[1.1rem]"
+                                                        hx-post="{% url 'delete_skill' skill.id %}"
+                                                        hx-trigger="confirmed"
+                                                        onclick="confirmAction(this, {title: 'Delete Skill?', text: 'Are you sure you want to delete {{ skill.name }}?'})"
+                                                        hx-target="#account-container"
+                                                        hx-swap="outerHTML">
+                                                    <i class="im im-x-mark-circle-o">delete</i>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="flex gap-[0.5rem] opacity-40 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
-                                            <a class="tag tag--pill tag--main text-[1.1rem]"
-                                               href="{% url 'update_skill' skill.id %}"
-                                               hx-target="#account-container"
-                                               hx-swap="outerHTML show:window:top"><i class="im im-edit">update</i></a>
-                                            <a class="tag tag--pill bg-error/10 text-error hover:bg-error/20 text-[1.1rem]"
-                                               href="{% url 'delete_skill' skill.id %}"
-                                               hx-target="#account-container"
-                                               hx-swap="outerHTML show:window:top"><i class="im im-x-mark-circle-o">delete</i></a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="flex flex-col items-center justify-center py-[3rem] text-center border border-dashed border-light/40 rounded-xl">
+                                    <i class="im im-lightning-bolt text-text/10 text-[3.5rem] mb-[1rem] block"></i>
+                                    <p class="text-[1.35rem] text-text/35 mb-[1.2rem]">No skills listed yet.</p>
+                                    <a href="{% url 'create_skill' %}"
+                                       class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
+                                       hx-target="#account-container"
+                                       hx-swap="outerHTML show:window:top">Add your first skill</a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                    <!-- Projects Section: full width grid -->
+                    <!-- Projects -->
                     <div class="card p-[3rem]">
                         <div class="flex justify-between items-center mb-[2rem]">
                             <h3 class="uppercase text-[1.8rem] font-bold text-sub tracking-wider">Projects</h3>
@@ -76,35 +115,54 @@
                                 <i class="im im-plus mr-1"></i> Add Project
                             </a>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-[1.5rem]">
-                            {% for project in profile.project_set.all %}
-
-                                <div class="flex items-center gap-[1.5rem] p-[1.2rem] rounded-xl hover:bg-bg transition-colors duration-200 group border border-light/30">
-                                    <a href="{% url 'project_detail' project.id %}"
-                                       class="flex items-center gap-[1.5rem] flex-1 min-w-0"
-                                       hx-target="#account-container"
-                                       hx-swap="outerHTML show:window:top">
-                                        <img src="{{ project.featured_image.url }}"
-                                             alt="Project Thumbnail"
-                                             class="w-[8rem] h-[6rem] object-cover rounded-lg shrink-0" />
-                                        <div class="min-w-0">
-                                            <span class="text-[1.45rem] font-semibold text-sub hover:text-main transition-colors block truncate">{{ project.title|title }}</span>
-                                            <p class="text-[1.3rem] text-text/60 mt-[0.2rem] line-clamp-1">{{ project.description|slice:"60" }}</p>
+                        {% if profile.project_set.all %}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-[1.5rem]">
+                                {% for project in profile.project_set.all %}
+                                    <div class="flex items-center gap-[1.5rem] p-[1.2rem] rounded-xl hover:bg-bg transition-colors duration-200 group border border-light/30">
+                                        <a href="{% url 'project_detail' project.id %}"
+                                           class="flex items-center gap-[1.5rem] flex-1 min-w-0"
+                                           hx-target="#account-container"
+                                           hx-swap="outerHTML show:window:top">
+                                            <img src="{{ project.featured_image.url }}"
+                                                 alt="Project Thumbnail"
+                                                 class="w-[8rem] h-[6rem] object-cover rounded-lg shrink-0" />
+                                            <div class="min-w-0">
+                                                <span class="text-[1.45rem] font-semibold text-sub hover:text-main transition-colors block truncate">{{ project.title|title }}</span>
+                                                {% if project.description %}
+                                                    <p class="text-[1.3rem] text-text/60 mt-[0.2rem] line-clamp-1">{{ project.description|slice:"60" }}</p>
+                                                {% else %}
+                                                    <p class="text-[1.3rem] text-text/30 mt-[0.2rem] italic">No description</p>
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                        <div class="flex gap-[0.5rem] shrink-0 opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                                            <a class="tag tag--pill tag--main text-[1.1rem]"
+                                               href="{% url 'update_project' project.id %}"
+                                               hx-target="#account-container"
+                                               hx-swap="outerHTML show:window:top"><i class="im im-edit"></i>update</a>
+                                            <button class="tag tag--pill bg-error/10 text-error hover:bg-error/20 text-[1.1rem]"
+                                                    hx-post="{% url 'delete_project' project.id %}"
+                                                    hx-trigger="confirmed"
+                                                    onclick="confirmAction(this, {title: 'Delete Project?', text: 'Are you sure you want to delete {{ project.title }}?'})"
+                                                    hx-target="#account-container"
+                                                    hx-swap="outerHTML">
+                                                <i class="im im-x-mark-circle-o"></i>delete
+                                            </button>
                                         </div>
-                                    </a>
-                                    <div class="flex gap-[0.5rem] shrink-0 opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-                                        <a class="tag tag--pill tag--main text-[1.1rem]"
-                                           href="{% url 'update_project' project.id %}"
-                                           hx-target="#account-container"
-                                           hx-swap="outerHTML show:window:top"><i class="im im-edit"></i>update</a>
-                                        <a class="tag tag--pill bg-error/10 text-error hover:bg-error/20 text-[1.1rem]"
-                                           href="{% url 'delete_project' project.id %}"
-                                           hx-target="#account-container"
-                                           hx-swap="outerHTML show:window:top"><i class="im im-x-mark-circle-o"></i>delete</a>
                                     </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="flex flex-col items-center justify-center py-[5rem] text-center border border-dashed border-light/40 rounded-xl">
+                                <i class="im im-folder text-text/10 text-[4rem] mb-[1.2rem] block"></i>
+                                <h4 class="text-[1.6rem] font-bold text-sub/50 mb-[0.5rem]">No projects yet</h4>
+                                <p class="text-[1.35rem] text-text/35 mb-[1.5rem]">Start building your portfolio by adding your first project.</p>
+                                <a href="{% url 'project_create' %}"
+                                   class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
+                                   hx-target="#account-container"
+                                   hx-swap="outerHTML show:window:top">Add your first project</a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -8,7 +8,16 @@
             <a class="btn btn--transparent text-[1.4rem]"
                href="{% url 'profile_detail' pk=recipient.id %}"
                hx-target="#form-container"
-               hx-swap="outerHTML show:window:top">&#x2190 Go Back</a>
+               hx-swap="outerHTML show:window:top">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+            </a>
             <h3 class="text-[2.4rem] font-bold text-sub mt-[2rem] mb-[0.5rem]">Send Message</h3>
             <p class="text-text/60 mb-[2rem] text-[1.4rem]">Write a message to {{ recipient.name }}.</p>
             <form class="form"

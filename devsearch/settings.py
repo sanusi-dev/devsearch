@@ -42,6 +42,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "devsearch.middleware.HtmxMessageMiddleware",
 ]
 
 ROOT_URLCONF = "devsearch.urls"
@@ -119,10 +120,17 @@ MEDIA_URL = ""
 
 SECRET_KEY = config("SECRET_KEY")
 DEBUG= config("DEBUG", default=False, cast=bool)
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+if DEBUG:
+    EMAIL_HOST = config("DEV_EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
+    EMAIL_HOST_USER = config("DEV_EMAIL_USER")
+    EMAIL_HOST_PASSWORD = config("DEV_EMAIL_PASSWORD")
+    EMAIL_PORT = config("DEV_EMAIL_PORT", default=2525, cast=int)
+else:
+    EMAIL_HOST = config("EMAIL_HOST")
+    EMAIL_HOST_USER = config("EMAIL_USER")
+    EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
+    EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 

@@ -58,6 +58,7 @@ def handle_allauth_signup(request, user, **kwargs):
         profile.email = sociallogin.user.email or profile.email
         profile.username = extra.get("login") or profile.username
         profile.social_github = extra.get("html_url", "")
+        profile.signup_method = sociallogin.account.provider.title()
         profile.save()
 
     send_welcome_email(profile)
@@ -70,7 +71,10 @@ def send_welcome_email(profile):
     django-mailer intercepts this via EMAIL_BACKEND and queues it in the DB.
     """
     subject = "Welcome to DevSearch!"
-    context = {"profile": profile}
+    context = {
+        "profile": profile,
+        "signup_method": profile.signup_method or "Email"
+    }
 
     text_body = render_to_string("users/welcome_email.txt", context)
     html_body = render_to_string("users/welcome_email.html", context)
