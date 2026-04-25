@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to DevSearch</title>
+    </head>
+    <body style="margin: 0;
+                 padding: 0;
+                 background-color: #0f1117;
+                 font-family: 'Courier New', Courier, monospace">
+        <!-- Outer wrapper -->
+        <table width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0" 
+               style="background-color: #0f1117;
+                      padding: 48px 16px">
+            <tr>
+                <td align="center">
+                    <!-- Card -->
+                    <table width="100%"
+                           cellpadding="0"
+                           cellspacing="0"
+                           border="0"
+                           style="max-width: 580px;
+                                  background-color: #161b27;
+                                  border-radius: 16px;
+                                  overflow: hidden">
+                        <!-- Top accent bar -->
+                        <tr>
+                            <td style="height: 3px; background-color: #10b981;"></td>
+                        </tr>
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 48px 32px;">
+                                <p style="margin: 0 0 28px 0;
+                                          font-size: 13px;
+                                          font-weight: 700;
+                                          letter-spacing: 0.2em;
+                                          color: #10b981;
+                                          text-transform: uppercase">DevSearch</p>
+                                <h1 style="margin: 0 0 12px 0;
+                                           font-size: 26px;
+                                           font-weight: 700;
+                                           color: #f0f4ff;
+                                           line-height: 1.3;
+                                           letter-spacing: -0.02em">Welcome aboard, {{ profile.name }}.</h1>
+                                <p style="margin: 0;
+                                          font-size: 14px;
+                                          color: rgba(240,244,255,0.4);
+                                          letter-spacing: 0.04em">
+                                    Joined via <span style="color: rgba(240,244,255,0.65); font-weight: 600;">{{ signup_method }}</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <!-- Divider -->
+                        <tr>
+                            <td style="padding: 0 48px;">
+                                <div style="height: 1px; background-color: rgba(255,255,255,0.06);"></div>
+                            </td>
+                        </tr>
+                        <!-- Body -->
+                        <tr>
+                            <td style="padding: 32px 48px;">
+                                <p style="margin: 0 0 28px 0;
+                                          font-size: 15px;
+                                          color: rgba(240,244,255,0.6);
+                                          line-height: 1.8">
+                                    DevSearch is where developers discover projects, showcase their work, and connect with peers around the globe. Here's how to make the most of it:
+                                </p>
+                                <!-- Steps -->
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <!-- Step 1 -->
+                                    <tr>
+                                        <td style="padding: 0 0 16px 0;">
+                                            <table width="100%"
+                                                   cellpadding="0"
+                                                   cellspacing="0"
+                                                   border="0"
+                                                   style="background-color: rgba(255,255,255,0.03);
+                                                          border: 1px solid rgba(255,255,255,0.06);
+                                                          border-radius: 10px">
+                                                <tr>
+                                                    <td style="padding: 20px 24px;">
+                                                        <p style="margin: 0 0 4px 0;
+                                                                  font-size: 11px;
+                                                                  font-weight: 700;
+                                                                  letter-spacing: 0.16em;
+                                                                  color: #10b981;
+                                                                  text-transform: uppercase">01 &mdash; Profile</p>
+                                                        <p style="margin: 0;
+                                                                  font-size: 14px;
+                                                                  color: rgba(240,244,255,0.55);
+                                                                  line-height: 1.7">
+                                                            Add your bio, social links, and skills to stand out to other developers.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- Step 2 -->
+                                    <tr>
+                                        <td style="padding: 0 0 16px 0;">
+                                            <table width="100%"
+                                                   cellpadding="0"
+                                                   cellspacing="0"
+                                                   border="0"
+                                                   style="background-color: rgba(255,255,255,0.03);
+                                                          border: 1px solid rgba(255,255,255,0.06);
+                                                          border-radius: 10px">
+                                                <tr>
+                                                    <td style="padding: 20px 24px;">
+                                                        <p style="margin: 0 0 4px 0;
+                                                                  font-size: 11px;
+                                                                  font-weight: 700;
+                                                                  letter-spacing: 0.16em;
+                                                                  color: #10b981;
+                                                                  text-transform: uppercase">02 &mdash; Projects</p>
+                                                        <p style="margin: 0;
+                                                                  font-size: 14px;
+                                                                  color: rgba(240,244,255,0.55);
+                                                                  line-height: 1.7">
+                                                            Publish what you've been building and let the community discover your work.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- Step 3 -->
+                                    <tr>
+                                        <td style="padding: 0 0 0 0;">
+                                            <table width="100%"
+                                                   cellpadding="0"
+                                                   cellspacing="0"
+                                                   border="0"
+                                                   style="background-color: rgba(255,255,255,0.03);
+                                                          border: 1px solid rgba(255,255,255,0.06);
+                                                          border-radius: 10px">
+                                                <tr>
+                                                    <td style="padding: 20px 24px;">
+                                                        <p style="margin: 0 0 4px 0;
+                                                                  font-size: 11px;
+                                                                  font-weight: 700;
+                                                                  letter-spacing: 0.16em;
+                                                                  color: #10b981;
+                                                                  text-transform: uppercase">03 &mdash; Connect</p>
+                                                        <p style="margin: 0;
+                                                                  font-size: 14px;
+                                                                  color: rgba(240,244,255,0.55);
+                                                                  line-height: 1.7">
+                                                            Message fellow developers directly from the platform — no third-party needed.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Divider -->
+                        <tr>
+                            <td style="padding: 0 48px;">
+                                <div style="height: 1px; background-color: rgba(255,255,255,0.06);"></div>
+                            </td>
+                        </tr>
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 28px 48px 40px;">
+                                <p style="margin: 0 0 4px 0;
+                                          font-size: 14px;
+                                          color: rgba(240,244,255,0.45);
+                                          line-height: 1.7">Questions? Just reply to this email.</p>
+                                <p style="margin: 0; font-size: 14px; color: rgba(240,244,255,0.35);">— The DevSearch Team</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- End Card -->
+                    <!-- Sub-footer -->
+                    <table width="100%"
+                           cellpadding="0"
+                           cellspacing="0"
+                           border="0"
+                           style="max-width: 580px;
+                                  margin-top: 24px">
+                        <tr>
+                            <td align="center" style="padding: 0 16px;">
+                                <p style="margin: 0;
+                                          font-size: 12px;
+                                          color: rgba(255,255,255,0.18);
+                                          line-height: 1.6;
+                                          letter-spacing: 0.04em">
+                                    You received this because you created a DevSearch account.
+                                    <br>
+                                    &copy; DevSearch. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

@@ -1,176 +1,258 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import *
-from .forms import *
-from django.contrib.auth.forms import AuthenticationForm
+from django.core.signing import Signer, BadSignature
+
+from allauth.account.forms import LoginForm, SignupForm
+from allauth.account.views import LoginView, SignupView
+from django_htmx.http import retarget
+
+from .models import Profile, Skill, Message
+from .forms import ProfileForm, SkillForm, MessageForm
 from .utils import search_profiles
 from projects.utils import pagination
 
-def auth_view(request):
 
+def signup_view(request):
     if request.user.is_authenticated:
-        return redirect('profile_list')
+        return redirect("profile_list")
 
-    current_url_name = request.resolver_match.url_name
-    login_form = AuthenticationForm()
-    register_form = UserRegistrationForm()
+    context = {"form": SignupForm()}
 
-    if request.method == 'POST' and "login_submit" in request.POST:
-        login_form = AuthenticationForm(request, data=request.POST)
-        if login_form.is_valid():
-            user = login_form.get_user()
-            login(request, user)
-            messages.success(request, f'Welcome back, {user.username}!')
+    if request.htmx:
+        return render(request, "account/signup.html#signup-form-partial", context)
 
-            if request.GET.get('next'):
-                prev_url = request.GET.get('next')
-                return redirect(prev_url)
-            else:
-                return redirect('profile_list')
-
-    if request.method == 'POST' and 'signup_submit' in request.POST:
-        register_form = UserRegistrationForm(request.POST)
-        if register_form.is_valid():
-            register_form.save()
-            messages.success(request, f'Account created for {request.POST['username']}! Please log in.')
-
-            return redirect('login')
+    return render(request, "account/signup.html", context)
 
 
-    context = {
-        'login_form': login_form,
-        'register_form': register_form,
-        'current_url_name': current_url_name
-    }
-    
-    return render(request, 'users/login_register.html', context)
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("profile_list")
+
+    context = {"form": LoginForm()}
+
+    if request.htmx:
+        return render(request, "account/login.html#login-form-partial", context)
+
+    return render(request, "account/login.html", context)
+
 
 def logout_user(request):
     logout(request)
-    return redirect('login')
+    return redirect("login")
+
+
+class CustomLoginView(LoginView):
+
+    def form_invalid(self, form):
+        if self.request.htmx:
+            response = render(
+                self.request, "account/login.html#login-form-partial", {"form": form}
+            )
+            return retarget(response, "#login-container")
+        return super().form_invalid(form)
+
+
+class CustomSignupView(SignupView):
+
+    def form_invalid(self, form):
+        if self.request.htmx:
+            response = render(
+                self.request, "account/signup.html#signup-form-partial", {"form": form}
+            )
+            return retarget(response, "#signup-container")
+        return super().form_invalid(form)
+
 
 def profile_list(request):
     search_query, profiles = search_profiles(request)
     page_obj = pagination(request, profiles)
 
-    context = {'page_obj': page_obj, 'search_query':search_query}
-    return render (request, 'users/profile_list.html', context)
+    context = {"page_obj": page_obj, "search_query": search_query}
+
+    if request.htmx:
+        target = request.htmx.target
+        if target == "main-content":
+            return render(request, "users/profile_list.html#profile-list-main", context)
+        if target == "list-container":
+            return render(request, "users/profile_list.html#profile-list-partial", context)
+
+    return render(request, "users/profile_list.html", context)
+
 
 def profile_detail(request, pk):
-    profile = Profile.objects.get(id=pk)
-    context = {'profile': profile}
-    return render (request, 'users/profile_detail.html', context)
+    profile = get_object_or_404(Profile, id=pk)
+    context = {"profile": profile}
 
-@login_required(login_url='login')
+    if request.htmx:
+        return render(request, "users/profile_detail.html#profile-detail-partial", context)
+
+    return render(request, "users/profile_detail.html", context)
+
+
+@login_required(login_url="login")
 def user_account(request):
-    profile = request.user.profile
-    context = {'profile': profile}
-    return render(request, 'users/user_account.html', context)
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    context = {"profile": profile}
 
-@login_required(login_url='login')
+    if request.htmx:
+        return render(request, "users/user_account.html#user-account-partial", context)
+
+    return render(request, "users/user_account.html", context)
+
+
+@login_required(login_url="login")
 def profile_edit(request):
     profile_form = ProfileForm(instance=request.user.profile)
 
     if request.method == "POST":
-        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = ProfileForm(
+            request.POST, request.FILES, instance=request.user.profile
+        )
         if profile_form.is_valid():
             profile_form.save()
-            return redirect('account')
-        
-    context = {'profile_form': profile_form}
-    return render(request, 'users/profile_form.html', context)
+            messages.success(request, "Profile updated successfully!")
+            return redirect("account")
 
-@login_required(login_url='login')
-def create_skill(request):
-    form = SkillForm()
-    
-    if request.method == 'POST':
-        form = SkillForm(request.POST)
-        if form.is_valid():
-            form = form.save(commit=False)
-            form.owner = request.user.profile
-            form.save()
-            return redirect('account')
-        
-    context = {'form': form}
-    return render(request, 'users/skill_create.html', context)
+        # Validation errors — re-render form partial for HTMX requests.
+        if request.htmx:
+            context = {"profile_form": profile_form}
+            return render(request, "users/profile_form.html#profile-form-partial", context)
 
-@login_required(login_url='login')
-def update_skill(request, pk):
+    context = {"profile_form": profile_form}
+
+    if request.htmx:
+        return render(request, "users/profile_form.html#profile-form-partial", context)
+
+    return render(request, "users/profile_form.html", context)
+
+
+@login_required(login_url="login")
+def skill_form(request, pk=None):
     profile = request.user.profile
-    skill = profile.skill_set.get(id=pk)
-
+    skill = get_object_or_404(Skill, id=pk, owner=profile) if pk else None
+    form_title = "Edit Skill" if pk else "Add Skill"
 
     form = SkillForm(instance=skill)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = SkillForm(request.POST, instance=skill)
         if form.is_valid():
-            form.save()
-            return redirect('account')
-        
-    context = {'form': form}
-    return render(request, 'users/skill_create.html', context)
+            new_skill = form.save(commit=False)
+            new_skill.owner = profile
+            new_skill.save()
+            action = "updated" if pk else "added"
+            messages.success(request, f"Skill '{new_skill.name}' {action} successfully!")
+            return redirect("account")
 
-@login_required(login_url='login')
+        # Validation errors — re-render form partial for HTMX requests.
+        if request.htmx:
+            context = {"form": form, "skill": skill, "form_title": form_title}
+            return render(request, "users/skill_create.html#skill-form-partial", context)
+
+    context = {"form": form, "skill": skill, "form_title": form_title}
+
+    if request.htmx:
+        return render(request, "users/skill_create.html#skill-form-partial", context)
+
+    return render(request, "users/skill_create.html", context)
+
+
+@login_required(login_url="login")
 def delete_skill(request, pk):
-    profile = request.user.profile
-    skill = profile.skill_set.get(id=pk)
-    
-    if request.method == 'POST':
-        skill.delete()
-        return redirect('account')
-    
-    context = {'skill': skill}
-    return render(request, 'users/delete.html', context)
+    skill = get_object_or_404(Skill, id=pk, owner=request.user.profile)
 
-@login_required(login_url='login')
+    if request.method == "POST":
+        skill.delete()
+        messages.success(request, f"Skill '{skill.name}' deleted successfully!")
+        return redirect("account")
+
+    return redirect("account")
+
+
+@login_required(login_url="login")
 def inbox(request):
     profile = request.user.profile
     un_read = profile.messages.filter(is_read=False).count()
-    context = {'profile': profile, 'un_read': un_read}
-    return render(request, 'users/inbox.html', context)
+    context = {"profile": profile, "un_read": un_read}
+
+    if request.htmx:
+        return render(request, "users/inbox.html#inbox-partial", context)
+
+    return render(request, "users/inbox.html", context)
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
 def message(request, pk):
-    print(request.resolver_match.url_name)
     recipient = request.user.profile
-    message = get_object_or_404(Message, id=pk, recipient=recipient)
+    msg = get_object_or_404(Message, id=pk, recipient=recipient)
 
-    if not message.is_read:
-        message.is_read = True
-        message.save()
+    if not msg.is_read:
+        msg.is_read = True
+        msg.save()
 
-    context = {'message': message}
-    return render(request, 'users/message.html', context)
+    context = {"message": msg}
+
+    if request.htmx:
+        return render(request, "users/message.html#message-detail-partial", context)
+
+    return render(request, "users/message.html", context)
+
+
+@login_required(login_url="login")
+def delete_message(request, pk):
+    msg = get_object_or_404(Message, id=pk, recipient=request.user.profile)
+
+    if request.method == "POST":
+        msg.delete()
+        messages.success(request, "Message deleted successfully!")
+        return redirect("inbox")
+
+    return redirect("inbox")
 
 
 def send_message(request, pk):
-
     recipient = get_object_or_404(Profile, id=pk)
     message_form = MessageForm()
 
     if request.method == "POST":
         message_form = MessageForm(request.POST)
         if message_form.is_valid():
-            message_form = message_form.save(commit=False)
+            msg = message_form.save(commit=False)
             if request.user.is_authenticated:
-                message_form.sender = request.user.profile
-                message_form.name = request.user.profile.name
-                message_form.email = request.user.profile.email
-            message_form.recipient = recipient
-            message_form.save()
-            return redirect('profile_detail', pk=recipient.id)
-        else:
-            message_form = MessageForm()
-        
+                msg.sender = request.user.profile
+                msg.name = request.user.profile.name
+                msg.email = request.user.profile.email
+            msg.recipient = recipient
+            msg.save()
+            messages.success(request, "Message sent successfully!")
+            return redirect("profile_detail", pk=recipient.id)
 
-    context = {
-        'message_form': message_form, 
-        'recipient': recipient
-    }
+        # Validation errors — re-render form partial for HTMX requests.
+        if request.htmx:
+            context = {"message_form": message_form, "recipient": recipient}
+            return render(request, "users/send_message.html#send-message-partial", context)
 
-    return render(request, 'users/send_message.html', context)
+    context = {"message_form": message_form, "recipient": recipient}
+
+    if request.htmx:
+        return render(request, "users/send_message.html#send-message-partial", context)
+
+    return render(request, "users/send_message.html", context)
+
+
+def unsubscribe(request, signature):
+    signer = Signer()
+    try:
+        profile_id = signer.unsign(signature)
+        profile = get_object_or_404(Profile, id=profile_id)
+        profile.receive_notifications = False
+        profile.save()
+        messages.success(
+            request, "You have been successfully unsubscribed from email notifications."
+        )
+    except BadSignature:
+        messages.error(request, "Invalid or expired unsubscribe link.")
+
+    return redirect("login")

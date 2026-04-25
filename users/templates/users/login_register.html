@@ -3,94 +3,185 @@
 {% load widget_tweaks %}
 {% block content %}
     {% if current_url_name == 'login' %}
-        <div class="auth">
-            <div class="card">
-                <div class="auth__header text-center">
-                    <a href="/">
-                        <img src="{% static 'images/icon.svg' %}" alt="icon" />
+        {% partialdef login-form-partial inline %}
+        <div class="relative w-full min-h-[85vh] flex justify-center items-center z-10 bg-transparent py-[2rem]"
+             id="auth-container">
+            <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-sub via-sub-light/80 to-main/40"></div>
+            <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top_right,rgba(90,165,185,0.2)_0%,transparent_60%)]">
+            </div>
+            <div class="card w-[95%] max-w-[55rem] p-[3rem_3.5rem] sm:p-[5rem_6rem] shadow-[0_8px_40px_rgba(0,0,0,0.2)] border-white/10 animate-slide-up">
+                <div class="text-center">
+                    <a href="/" class="inline-block">
+                        <img src="{% static 'images/icon.svg' %}"
+                             alt="icon"
+                             class="mx-auto h-[5rem]" />
                     </a>
-                    <h3>Account Login</h3>
-                    <p>Hello Developer, Welcome Back!</p>
+                    <h3 class="text-[2.8rem] text-sub font-bold mt-[1.5rem]">Welcome Back</h3>
+                    <p class="font-normal text-[1.5rem] text-text/60 mb-[2rem]">Login to your developer account</p>
                 </div>
-                <form action="" class="form auth__form" method="post">
+
+                {# ── Email + Password Login ── #}
+                <form class="form my-[2rem]"
+                      method="post"
+                      action="{% url 'account_login' %}">
                     {% csrf_token %}
-                    <!-- Input:Email -->
-                    {% for field in login_form %}
-                        <div class="form__field">
-                            <label for="formInput#text">{{ field.label }}:</label>
-                            {% if field.name == 'username' %}
-                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:Enter your username..." }}
-                            {% elif  field.name == 'password' %}
-                                {{ field|add_class:"input input--password"|attr:"id:formInput#passowrd"|attr:"placeholder:••••••••" }}
-                            {% endif %}
-                            {% for error in field.errors %}<span class="error-message">{{ error }}</span>{% endfor %}
-                        </div>
-                    {% endfor %}
+                    <input type="hidden" name="next" value="{% url 'profile_list' %}" />
+                    <div class="form__field">
+                        <label for="id_login">Email:</label>
+                        {{ login_form.login|add_class:"input"|attr:"id:id_login"|attr:"placeholder:e.g. user@domain.com" }}
+                        {% for error in login_form.login.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form__field">
+                        <label for="id_password">Password:</label>
+                        {{ login_form.password|add_class:"input"|attr:"id:id_password"|attr:"placeholder:••••••••" }}
+                        {% for error in login_form.password.errors %}
+                            <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        {% endfor %}
+                    </div>
                     {% if login_form.non_field_errors %}
-                        <ul class="errorlist">
-                            {% for error in login_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                    <div class="auth__actions">
-                        <input class="btn btn--sub btn--lg"
-                               type="submit"
-                               name="login_submit"
-                               value="Log In" />
-                        <a href="{% url 'password_reset' %}">Forget Password?</a>
-                    </div>
-                </form>
-                <div class="auth__alternative">
-                    <p>Don’t have an Account?</p>
-                    <a href="{% url 'signup' %}">Sign Up</a>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="auth">
-            <div class="card">
-                <div class="auth__header text-center">
-                    <a href="/">
-                        <img src="{% static 'images/icon.svg' %}" alt="icon" />
-                    </a>
-                    <h3>Account SignUp</h3>
-                    <p>Create a new developer account</p>
-                </div>
-                <form action="" class="form auth__form" method="post">
-                    {% csrf_token %}
-                    {% for field in register_form %}
-                        <div class="form__field">
-                            <label for="formInput#text">{{ field.label }}:</label>
-                            {% if field.name == 'username' %}
-                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:e.g. Dennis1234" }}
-                            {% elif field.name == 'email' %}
-                                {{ field|add_class:"input input--email"|attr:"id:formInput#email"|attr:"placeholder:e.g. user@domain.com" }}
-                            {% elif field.name == 'name' %}
-                                {{ field|add_class:"input input--text"|attr:"id:formInput#text"|attr:"placeholder:e.g. Dennis Ivanov" }}
-                            {% elif field.name == 'password1' %}
-                                {{ field|add_class:"input input--password"|attr:"id:formInput#password"|attr:"placeholder:••••••••" }}
-                            {% elif field.name == 'password2' %}
-                                {{ field|add_class:"input input--password"|attr:"id:formInput#confirm-passowrd"|attr:"placeholder:••••••••" }}
-                            {% endif %}
-                            {% for error in field.errors %}<span class="error-message">{{ error }}</span>{% endfor %}
+                        <div class="bg-error-bg rounded-xl p-[1.2rem] mb-[1.5rem]">
+                            <ul class="text-[1.3rem] font-medium text-error list-none">
+                                {% for error in login_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
                         </div>
-                    {% endfor %}
-                    {% if register_form.non_field_errors %}
-                        <ul class="errorlist">
-                            {% for error in register_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
                     {% endif %}
-                    <div class="auth__actions">
-                        <input class="btn btn--sub btn--lg"
+                    <div class="flex justify-between items-center my-[2.5rem]">
+                        <input class="btn btn--sub text-[1.4rem]"
                                type="submit"
-                               name="signup_submit"
-                               value="Sign  In" />
+                               value="Log In" />
+                        <a href="{% url 'password_reset' %}"
+                           class="text-main text-[1.4rem] hover:underline">Forgot Password?</a>
                     </div>
                 </form>
-                <div class="auth__alternative">
-                    <p>Already have an Account?</p>
-                    <a href="{% url 'login' %}">Log In</a>
+
+                {# ── Divider ── #}
+                <div class="flex items-center gap-[1.5rem] my-[2rem]">
+                    <div class="flex-1 h-[1px] bg-light/40"></div>
+                    <span class="text-[1.3rem] text-text/40 font-medium uppercase tracking-wider">or</span>
+                    <div class="flex-1 h-[1px] bg-light/40"></div>
+                </div>
+
+                {# ── GitHub OAuth ── #}
+                <form method="post" action="{% url 'github_login' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="w-full flex items-center justify-center gap-[1rem] py-[1.2rem] px-[2rem] rounded-xl
+                                   bg-[#24292f] hover:bg-[#1b1f23] text-white text-[1.4rem] font-semibold
+                                   transition-all duration-200 ease-out hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]
+                                   border border-white/10 cursor-pointer">
+                        <svg class="w-[2rem] h-[2rem]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                        Continue with GitHub
+                    </button>
+                </form>
+
+                <div class="border-t border-light/60 pt-[2rem] mt-[2.5rem]">
+                    <p class="text-[1.4rem] text-text/50">
+                        Don't have an account?
+                        <a href="{% url 'signup' %}"
+                           hx-target="#auth-container"
+                           hx-swap="outerHTML"
+                           class="text-main font-semibold hover:underline ml-1">Sign Up</a>
+                    </p>
                 </div>
             </div>
         </div>
-    {% endif %}
+    {% endpartialdef %}
+{% else %}
+    {% partialdef signup-form-partial inline %}
+    <div class="relative w-full min-h-[85vh] flex justify-center items-center z-10 bg-transparent py-[2rem]"
+         id="auth-container">
+        <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-sub via-sub-light/80 to-main/40"></div>
+        <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top_right,rgba(90,165,185,0.2)_0%,transparent_60%)]">
+        </div>
+        <div class="card w-[60%] max-w-[55rem] p-[3rem_3.5rem] sm:p-[5rem_6rem] shadow-[0_8px_40px_rgba(0,0,0,0.2)] border-white/10 animate-slide-up">
+            <div class="text-center">
+                <a href="/" class="inline-block">
+                    <img src="{% static 'images/icon.svg' %}"
+                         alt="icon"
+                         class="mx-auto h-[5rem]" />
+                </a>
+                <h3 class="text-[2.8rem] text-sub font-bold mt-[1.5rem]">Create Account</h3>
+                <p class="font-normal text-[1.5rem] text-text/60 mb-[2rem]">Join the developer community</p>
+            </div>
+
+            {# ── Email + Password Signup ── #}
+            <form class="form my-[2rem]"
+                  method="post"
+                  action="{% url 'account_signup' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'profile_list' %}" />
+                <div class="form__field">
+                    <label for="id_email">Email:</label>
+                    {{ signup_form.email|add_class:"input"|attr:"id:id_email"|attr:"placeholder:e.g. user@domain.com" }}
+                    {% for error in signup_form.email.errors %}
+                        <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form__field">
+                    <label for="id_password1">Password:</label>
+                    {{ signup_form.password1|add_class:"input"|attr:"id:id_password1"|attr:"placeholder:••••••••" }}
+                    {% for error in signup_form.password1.errors %}
+                        <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form__field">
+                    <label for="id_password2">Confirm Password:</label>
+                    {{ signup_form.password2|add_class:"input"|attr:"id:id_password2"|attr:"placeholder:••••••••" }}
+                    {% for error in signup_form.password2.errors %}
+                        <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% if signup_form.non_field_errors %}
+                    <div class="bg-error-bg rounded-xl p-[1.2rem] mb-[1.5rem]">
+                        <ul class="text-[1.3rem] font-medium text-error list-none">
+                            {% for error in signup_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="my-[2.5rem]">
+                    <input class="btn btn--sub text-[1.4rem]"
+                           type="submit"
+                           value="Create Account" />
+                </div>
+            </form>
+
+            {# ── Divider ── #}
+            <div class="flex items-center gap-[1.5rem] my-[2rem]">
+                <div class="flex-1 h-[1px] bg-light/40"></div>
+                <span class="text-[1.3rem] text-text/40 font-medium uppercase tracking-wider">or</span>
+                <div class="flex-1 h-[1px] bg-light/40"></div>
+            </div>
+
+            {# ── GitHub OAuth ── #}
+            <form method="post" action="{% url 'github_login' %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="w-full flex items-center justify-center gap-[1rem] py-[1.2rem] px-[2rem] rounded-xl
+                               bg-[#24292f] hover:bg-[#1b1f23] text-white text-[1.4rem] font-semibold
+                               transition-all duration-200 ease-out hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]
+                               border border-white/10 cursor-pointer">
+                    <svg class="w-[2rem] h-[2rem]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    Sign up with GitHub
+                </button>
+            </form>
+
+            <div class="border-t border-light/60 pt-[2rem] mt-[2.5rem]">
+                <p class="text-[1.4rem] text-text/50">
+                    Already have an account?
+                    <a href="{% url 'login' %}"
+                       hx-target="#auth-container"
+                       hx-swap="outerHTML"
+                       class="text-main font-semibold hover:underline ml-1">Log In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endpartialdef %}
+{% endif %}
 {% endblock content %}

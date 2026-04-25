@@ -9,7 +9,7 @@ def search_projects(request):
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
 
-    projects = Project.objects.filter(Q(title__icontains=search_query) |
+    projects = Project.objects.select_related('owner').prefetch_related('tags').filter(Q(title__icontains=search_query) |
                                       Q(owner__name__icontains=search_query) |
                                       Q(tags__name__icontains=search_query) |
                                       Q(description__icontains=search_query)
@@ -22,7 +22,7 @@ def pagination(request, query):
     
     query = query.order_by('-created_at')
     page_number = request.GET.get('page')
-    items_per_page = 4
+    items_per_page = 9
     paginator = Paginator(query, items_per_page)
     page_obj = paginator.get_page(page_number)
 

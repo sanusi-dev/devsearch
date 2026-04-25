@@ -1,24 +1,89 @@
 {% extends "main.html" %}
 {% load static %}
 {% block content %}
-  <!-- Main Section -->
-  <main class="messagePage my-xl">
-    <div class="content-box">
-      <div class="message">
-        <a class="backButton" href="{% url 'inbox' %}"><i class="im im-angle-left"></i></a>
-        <h2 class="message__subject">
-          {{ message.subject }}
-        </h4>
-        {% if message.sender %}
-          <a href="{% url 'profile_detail' message.sender.id %}"
-             class="message__author">{{ message.sender.name }}</a>
-        {% else %}
-          <p class="message__date">{{ message.name }}</p>
-          <p class="message__date">{{ message.email }}</p>
-        {% endif %}
-        <p class="message__date">{{ message.created_at }}</p>
-        <div class="message__body">{{ message.body|linebreaksbr }}</div>
-      </div>
-    </div>
-  </main>
+    {% partialdef message-detail-partial inline %}
+    <main class="my-[6rem] animate-fade-in" id="message-detail-partial">
+        <div class="content-box">
+            <!-- Top Action Bar -->
+            <div class="flex items-center justify-between mb-[4rem]">
+                <a class="back-btn"
+                   href="{% url 'inbox' %}"
+                   hx-target="#message-detail-partial"
+                   hx-swap="outerHTML show:window:top">
+                    <i class="im im-angle-left">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor"
+                             class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                        </svg>
+                    </i>
+                </a>
+                <div class="flex gap-[0.8rem]">
+                    {% if message.sender %}
+                        <a href="{% url 'send_message' message.sender.id %}"
+                           hx-target="#message-detail-partial"
+                           hx-swap="outerHTML show:window:top"
+                           class="btn btn--sub !py-[0.7rem] !px-[1.8rem] !text-[1.3rem]">Reply</a>
+                    {% endif %}
+                    <button class="btn btn--sub !text-error !border-error/20 hover:!bg-error/5 !py-[0.7rem] !px-[1.8rem] !text-[1.3rem]"
+                            type="button"
+                            hx-post="{% url 'delete_message' message.id %}"
+                            hx-trigger="confirmed"
+                            hx-target="#message-detail-partial"
+                            hx-swap="outerHTML show:window:top"
+                            onclick="confirmAction(this, {title: 'Delete Message?', text: 'Are you sure you want to delete this message?'})">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <!-- Sender Info -->
+            <div class="flex flex-col md:flex-row gap-[2.5rem] items-start mb-[4rem] pb-[4rem] border-b border-light/50">
+                <div class="shrink-0">
+                    {% if message.sender %}
+                        <a href="{% url 'profile_detail' message.sender.id %}"
+                           hx-target="#message-detail-partial"
+                           hx-swap="outerHTML show:window:top">
+                            <img src="{{ message.sender.profile_image.url }}"
+                                 alt="{{ message.sender.name }}"
+                                 class="avatar avatar--xl border-2 border-light/30" />
+                        </a>
+                    {% else %}
+                        <div class="avatar avatar--xl bg-light/30 flex items-center justify-center border-2 border-light/30">
+                            <i class="im im-user-male text-text/20 text-[4rem]"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1 pt-[0.5rem]">
+                    <p class="text-[1.15rem] text-text/35 font-semibold uppercase tracking-[0.15em] mb-[0.8rem]">Message</p>
+                    <h2 class="text-[2.4rem] font-bold text-sub leading-tight mb-[1.2rem]">{{ message.subject }}</h2>
+                    <div class="flex items-center gap-[0.8rem] flex-wrap text-[1.4rem]">
+                        <span class="text-text/50">From</span>
+                        {% if message.sender %}
+                            <a href="{% url 'profile_detail' message.sender.id %}"
+                               hx-target="#message-detail-partial"
+                               hx-swap="outerHTML show:window:top"
+                               class="font-bold text-main hover:underline">{{ message.sender.name }}</a>
+                        {% else %}
+                            <span class="font-bold text-sub">{{ message.name }}</span>
+                            <span class="text-text/25">·</span>
+                            <span class="text-text/45">{{ message.email }}</span>
+                        {% endif %}
+                        <span class="text-text/25">·</span>
+                        <span class="text-text/40">{{ message.created_at|date:"F j, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Message Body -->
+            <div class="border border-light/50 rounded-2xl p-[3rem] md:p-[4rem]">
+                <p class="text-[1.6rem] leading-[1.9] text-text/75 whitespace-pre-wrap">{{ message.body }}</p>
+            </div>
+            <div class="mt-[4rem] text-center">
+                <span class="text-[1.15rem] text-text/25 uppercase tracking-[0.2em] font-semibold">— End of Message —</span>
+            </div>
+        </div>
+    </main>
+{% endpartialdef %}
 {% endblock content %}

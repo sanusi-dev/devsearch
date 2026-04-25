@@ -1,41 +1,69 @@
 {% load static %}
-<header class="header">
-    <div class="container container--narrow">
-        <a href="{% url 'profile_list' %}" class="header__logo">
-            <img src="{% static 'images/logo.svg' %}" alt="DevSearch Logo" />
+<header class="sticky top-0 z-[111] bg-sub py-[1.5rem] border-b border-white/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
+    <div class="container container--narrow flex justify-between items-center">
+        <a href="{% url 'profile_list' %}"
+           class="relative z-[999] group"
+           hx-target="#main-content"
+           hx-swap="innerHTML show:window:top">
+            <img src="{% static 'images/logo.svg' %}"
+                 alt="DevSearch Logo"
+                 class="h-[3.8rem] transition-transform duration-300 group-hover:scale-105" />
         </a>
-        <nav class="header__nav">
-            <input type="checkbox" id="responsive-menu" />
+        <nav class="relative">
+            <input type="checkbox" id="responsive-menu" class="peer hidden" />
             <label for="responsive-menu" class="toggle-menu">
-                <span>Menu</span>
+                <span class="toggle-menu-span">Menu</span>
                 <div class="toggle-menu__lines"></div>
             </label>
-            <ul class="header__menu">
+            <ul class="opacity-0 pointer-events-none flex-col justify-center fixed inset-0 bg-sub transition-all duration-500 ease-in-out md:opacity-100 md:pointer-events-auto md:relative md:flex-row md:inline-flex md:items-center md:bg-transparent md:gap-[5rem] peer-checked:opacity-100 peer-checked:pointer-events-auto flex">
                 {% if request.user.is_authenticated %}
-                    <li class="header__menuItem">
-                        <a href="{% url 'profile_list' %}">Developers</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'profile_list' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Developers</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'project_list' %}">Projects</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'project_list' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Projects</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'inbox' %}">Inbox</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'inbox' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Inbox</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'account' %}">My Account</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'account' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">My Account</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'logout_user' %}" class="btn btn--sub">Logout</a>
+                    <li class="md:p-0 p-[1rem_3rem] md:hover:bg-transparent rounded-lg">
+                        <a href="{% url 'logout_user' %}"
+                           class="btn btn--sub text-[1.35rem] py-[0.7rem] px-[2rem]"
+                           hx-boost="false">Logout</a>
                     </li>
                 {% else %}
-                    <li class="header__menuItem">
-                        <a href="{% url 'profile_list' %}">Developers</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'profile_list' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Developers</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'project_list' %}">Projects</a>
+                    <li class="md:p-0 p-[1rem_3rem] hover:bg-white/[0.06] md:hover:bg-transparent rounded-lg transition-all duration-300">
+                        <a href="{% url 'project_list' %}"
+                           class="text-white/70 font-normal hover:text-white text-[1.45rem] transition-colors duration-200"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Projects</a>
                     </li>
-                    <li class="header__menuItem">
-                        <a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a>
+                    <li class="md:p-0 p-[1rem_3rem] md:hover:bg-transparent rounded-lg">
+                        <a href="{% url 'login' %}"
+                           class="btn btn--sub text-[1.35rem] py-[0.7rem] px-[2rem]"
+                           hx-target="#main-content"
+                           hx-swap="innerHTML show:window:top">Login/Sign Up</a>
                     </li>
                 {% endif %}
             </ul>

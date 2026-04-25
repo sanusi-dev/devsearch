@@ -17,6 +17,8 @@ class Profile(models.Model):
     social_linkedin = models.URLField(null=True, blank=True)
     social_youtube = models.URLField(null=True, blank=True)
     social_website = models.URLField(null=True, blank=True)
+    signup_method = models.CharField(max_length=50, null=True, blank=True, default='email')
+    receive_notifications = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
@@ -32,7 +34,7 @@ class Skill(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name) if self.name else ''
     
 
 class Message(models.Model):
@@ -54,7 +56,7 @@ class Message(models.Model):
 
         constraints = [
             models.CheckConstraint(
-                check=~models.Q(sender=models.F('recipient')),
+                condition=~models.Q(sender=models.F('recipient')),
                 name='prevent_self_message'
             )
         ]
