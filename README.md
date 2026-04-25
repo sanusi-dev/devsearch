@@ -14,16 +14,18 @@ DevSearch is a full-stack web platform where developers can showcase their portf
 
 | Page | Preview |
 |---|---|
-| Developer Profiles | *(screenshot placeholder)* |
-| Project Showcase | *(screenshot placeholder)* |
-| Developer Portfolio | *(screenshot placeholder)* |
-| Inbox | *(screenshot placeholder)* |
+| Developer Profiles | ![Developer Profiles](static/images/screenshots/developer_profiles.png) |
+| Login Page | ![Login](static/images/screenshots/login.png) |
+| Signup Page | ![Signup](static/images/screenshots/signup.png) |
+| Project Showcase | ![Project Showcase](static/images/screenshots/project_showcase.png) |
+| Developer Portfolio | ![Developer Portfolio](static/images/screenshots/developer_portfolio.png) |
+| Inbox | ![Inbox](static/images/screenshots/inbox.png) |
 
 ---
 
 ## 🎥 Demo
 
-> *A walkthrough video will be added here. In the meantime, see the screenshots above.*
+![Demo Video](static/videos/demo.mp4)
 
 ---
 

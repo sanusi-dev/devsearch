@@ -52,3 +52,14 @@ static/images/profiles/profilepic.jpg
 
 # django-mailer lock files created by the background worker process
 linux-pc-*
+
+# Puppeteer
+.cache/
+
+# Screenshot generation scripts
+take_screenshots.*
+.playwright_venv/
+
+# Video generation scripts
+record_demo.*
+test_video.*

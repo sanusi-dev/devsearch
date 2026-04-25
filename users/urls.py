@@ -24,7 +24,7 @@ urlpatterns = [
     path("logout/", logout_user, name="logout_user"),
 
     path("account/", user_account, name="account"),
-    path("profiles/", profile_list, name="profile_list"),
+    path("", profile_list, name="profile_list"),
     path("profile/<str:pk>/", profile_detail, name="profile_detail"),
     path("profile-edit/", profile_edit, name="profile_edit"),
 
