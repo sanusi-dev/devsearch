@@ -25,7 +25,7 @@ DevSearch is a full-stack web platform where developers can showcase their portf
 
 ## 🎥 Demo
 
-![Demo Video](static/videos/demo.mp4)
+![Demo Video](static/videos/demo.gif)
 
 ---
 
