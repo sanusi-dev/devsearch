@@ -143,8 +143,9 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Whitenoise compression and caching for production.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Whitenoise compression for production (no manifest — avoids crash if
+# collectstatic hasn't been run during the build step).
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Media files (user-uploaded content: profile pictures, project images, etc.)
 MEDIA_URL = "/media/"
