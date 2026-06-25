@@ -37,8 +37,6 @@ Thumbs.db
 node_modules/
 
 # Tailwind — the compiled output is generated, not authored
-static/styles/output.css
-
 # Django collected static (production build artefact)
 staticfiles/
 static_root/
