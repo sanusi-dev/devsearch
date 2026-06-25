@@ -1,6 +1,5 @@
 {% extends "main.html" %}
 {% load static %}
-{% load widget_tweaks %}
 {% block content %}
     {% partialdef project-detail-partial inline %}
     <!-- Main Section -->
@@ -83,6 +82,7 @@
                                           hx-post="{% url 'project_detail' project.id %}"
                                           hx-target="#feedback"
                                           hx-swap="outerHTML">
+                                        {% csrf_token %}
                                         {% for field in review_form %}
                                             <div class="form__field">
                                                 <label for="formInput#textarea">{{ field.label }}</label>

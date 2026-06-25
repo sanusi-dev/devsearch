@@ -1,14 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Prefetch
 from django_htmx.http import HttpResponseClientRedirect, push_url
 
+from users.models import Profile
 from .models import Project, Review, Tag
 from .forms import ProjectForm, ReviewForm
 from .utils import search_projects, pagination
 
 
+def _get_user_profile(request):
+    """Safely retrieve the current user's profile, or return 404."""
+    return get_object_or_404(Profile, user=request.user)
+
+
 def project_list(request):
+    """List projects with search and pagination."""
     search_query, projects = search_projects(request)
     page_obj = pagination(request, projects)
 
@@ -25,25 +33,27 @@ def project_list(request):
 
 
 def project_detail(request, pk):
-    project = get_object_or_404(Project, id=pk)
+    """Show a single project with reviews and feedback form."""
+    project = get_object_or_404(
+        Project.objects.prefetch_related("tags"),
+        id=pk,
+    )
     review_form = ReviewForm()
     reviewers = project.review_set.select_related("owner").all()
     has_reviewed = (
-        reviewers.filter(owner=request.user.profile).exists()
-        if request.user.is_authenticated
-        else False
+        request.user.is_authenticated
+        and reviewers.filter(owner__user=request.user).exists()
     )
 
     if request.method == "POST":
         review_form = ReviewForm(request.POST)
         if review_form.is_valid():
             review = review_form.save(commit=False)
-            review.owner = request.user.profile
+            review.owner = _get_user_profile(request)
             review.project = project
             review.save()
             messages.success(request, "Review submitted successfully!")
 
-            # Re-fetch after save so the new review is included in context.
             reviewers = project.review_set.select_related("owner").all()
             has_reviewed = True
 
@@ -58,7 +68,6 @@ def project_detail(request, pk):
 
             return redirect("project_detail", pk=project.id)
 
-        # Validation errors — re-render the review form partial for HTMX requests.
         if request.htmx:
             context = {
                 "project": project,
@@ -83,7 +92,8 @@ def project_detail(request, pk):
 
 @login_required(login_url="login")
 def project_form(request, pk=None):
-    profile = request.user.profile
+    """Create or edit a project for the current user's profile."""
+    profile = _get_user_profile(request)
     project = get_object_or_404(Project, id=pk) if pk else None
 
     if project and project.owner != profile:
@@ -98,13 +108,12 @@ def project_form(request, pk=None):
             new_project = form.save(commit=False)
             new_project.owner = profile
             new_project.save()
-            form.save_m2m()  # Persist many-to-many fields (tags).
+            form.save_m2m()
 
             action = "updated" if pk else "created"
             messages.success(request, f"Project '{new_project.title}' {action} successfully!")
             return redirect("account")
 
-        # Validation errors — re-render the form partial for HTMX requests.
         if request.htmx:
             context = {"form": form, "project": project, "form_title": form_title}
             return render(request, "projects/project_create.html#project-form-partial", context)
@@ -119,11 +128,14 @@ def project_form(request, pk=None):
 
 @login_required(login_url="login")
 def delete_project(request, pk):
-    project = get_object_or_404(Project, id=pk, owner=request.user.profile)
+    """Delete a project owned by the current user."""
+    profile = _get_user_profile(request)
+    project = get_object_or_404(Project, id=pk, owner=profile)
 
     if request.method == "POST":
+        project_title = project.title
         project.delete()
-        messages.success(request, f"Project '{project.title}' deleted successfully!")
+        messages.success(request, f"Project '{project_title}' deleted successfully!")
         return redirect("account")
 
     return redirect("account")

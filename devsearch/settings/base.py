@@ -1,12 +1,13 @@
-from pathlib import Path
 import os
+from pathlib import Path
+
 from decouple import config, Csv
 
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # Third-party
+    "whitenoise.runserver_nostatic",
     "django_htmx",
     "mailer",
     "widget_tweaks",
@@ -45,6 +47,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -116,12 +119,13 @@ USE_TZ = True
 # ---------------------------------------------------------------------------
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# Whitenoise compression and caching for production.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Media files (user-uploaded content: profile pictures, project images, etc.)
-# All uploads are stored inside static/images/ — this keeps the existing files
-# working without migration. For production, move uploads to a dedicated
-# object storage bucket (e.g. S3) and update MEDIA_ROOT/MEDIA_URL accordingly.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "static" / "images"
 
@@ -146,7 +150,6 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Use django-mailer to queue emails in the database.
-# The background worker (run_mailer.sh) dispatches them via the SMTP backend below.
 EMAIL_BACKEND = "mailer.backend.DbBackend"
 MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
@@ -158,8 +161,9 @@ MAILER_EMPTY_QUEUE_SLEEP = 30
 # ---------------------------------------------------------------------------
 
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -175,6 +179,56 @@ SOCIALACCOUNT_PROVIDERS = {
         "APP": {
             "client_id": config("GITHUB_CLIENT_ID", default=""),
             "secret": config("GITHUB_CLIENT_SECRET", default=""),
+        },
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Security headers (production defaults — overridden in dev.py)
+# ---------------------------------------------------------------------------
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }

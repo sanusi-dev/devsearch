@@ -24,6 +24,7 @@
                   hx-post="{% url 'send_message' pk=recipient.id %}"
                   hx-target="#form-container"
                   hx-swap="outerHTML">
+                {% csrf_token %}
                 {% if request.user.is_authenticated %}
                     <div class="form__field">
                         <label for="formInput#text">{{ message_form.subject.label }}</label>
