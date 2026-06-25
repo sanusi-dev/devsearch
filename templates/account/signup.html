@@ -22,6 +22,7 @@
             <form class="form my-[2rem]"
                   method="post"
                   action="{% url 'account_signup' %}">
+                {% csrf_token %}
                 <div class="form__field">
                     <label for="id_email">Email:</label>
                     {{ form.email|add_class:"input"|attr:"id:id_email"|attr:"placeholder:e.g. user@domain.com" }}
