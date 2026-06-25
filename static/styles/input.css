@@ -97,7 +97,7 @@
   .card {
     @apply rounded-2xl bg-white w-auto h-auto my-[0.5rem] overflow-hidden
            shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)]
-           border border-light/50 p-[2rem_2rem] sm:p-[3.5rem] md:p-[5rem]
+           border border-light/50 p-7 sm:p-8 md:p-9
            transition-all duration-300 ease-out;
   }
   .card__body, .card__header { @apply p-[2rem_2.5rem]; }
@@ -107,15 +107,15 @@
 
   /* Forms */
   .form { @apply block; }
-  .form__field { @apply my-[1.5rem]; }
-  .form__label, .form__field > label { @apply block mb-[0.5rem] text-text font-medium text-[1.4rem]; }
+  .form__field { @apply my-5; }
+  .form__label, .form__field > label { @apply block mb-1.5 text-text font-medium text-[1.45rem]; }
   .input {
-    @apply min-w-0 w-full py-[1.2rem] px-[1.5rem] rounded-xl
-           border-2 border-transparent bg-bg
-           transition-all duration-300
-           hover:bg-light/40
-           focus:outline-none focus:bg-white focus:border-main
-           focus:ring-4 focus:ring-main/15;
+    @apply min-w-0 w-full py-[1.15rem] px-[1.4rem] rounded-2xl
+           border-2 border-light bg-white text-[1.5rem] text-sub
+           transition-all duration-200
+           placeholder:text-text/40
+           hover:border-main/40
+           focus:outline-none focus:border-main focus:ring-4 focus:ring-main/10;
   }
   .input--textarea { @apply min-h-[14rem] resize-none; }
 

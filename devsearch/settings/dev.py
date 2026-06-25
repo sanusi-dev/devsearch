@@ -6,6 +6,10 @@ from .base import *  # noqa: F401, F403
 
 DEBUG = True
 
+# Allow any host in development (common when running on 0.0.0.0, LAN IP,
+# or testing on mobile devices on the same network).
+ALLOWED_HOSTS = ["*"]
+
 # Disable production security settings for local development.
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False

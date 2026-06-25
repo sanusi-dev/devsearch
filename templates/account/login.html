@@ -1,71 +1,85 @@
-{% extends "main.html" %}
+{% extends "auth_base.html" %}
 {% load static %}
 {% load widget_tweaks %}
+
+{% block title %}Log in - DevSearch{% endblock title %}
+
 {% block content %}
     {% partialdef login-form-partial inline %}
-    <div class="relative w-full min-h-screen flex justify-center items-center bg-sub py-[2rem] px-4"
-         id="login-container">
-        <div class="card w-full max-w-[44rem] shadow-[0_8px_40px_rgba(0,0,0,0.2)] animate-slide-up">
-            <div class="text-center">
-                <img src="{% static 'images/icon.svg' %}"
-                     alt="DevSearch"
-                     class="mx-auto h-[4.5rem]" />
-                <h3 class="text-[2.4rem] text-sub font-bold mt-[1.5rem]">Welcome Back</h3>
-                <p class="text-[1.4rem] text-text/60 mb-[2rem]">Login to your developer account</p>
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 bg-sub" id="login-container">
+        <div class="w-full max-w-[38rem] card shadow-[0_10px_50px_rgba(0,0,0,0.25)] animate-slide-up">
+            <div class="text-center mb-6">
+                <a href="/">
+                    <img src="{% static 'images/icon.svg' %}" alt="DevSearch" class="mx-auto h-16 sm:h-20" />
+                </a>
+                <h1 class="mt-5 text-[2.2rem] sm:text-[2.6rem] text-sub font-semibold tracking-tight">Welcome back</h1>
+                <p class="mt-2 text-[1.5rem] text-text/70">Log in to your developer account</p>
             </div>
-            <form class="form"
-                  method="post"
-                  action="{% url 'account_login' %}">
+
+            <form class="form" method="post" action="{% url 'account_login' %}" novalidate>
                 {% csrf_token %}
+
                 <div class="form__field">
-                    <label for="id_login">Email</label>
-                    {{ form.login|add_class:"input"|attr:"id:id_login"|attr:"placeholder:you@domain.com" }}
+                    <label for="id_login" class="text-[1.45rem]">Email</label>
+                    {{ form.login|add_class:"input"|attr:"id:id_login"|attr:"placeholder:you@domain.com"|attr:"autocomplete:email" }}
                     {% for error in form.login.errors %}
-                        <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        <span class="text-[1.35rem] font-medium text-error block mt-1.5">{{ error }}</span>
                     {% endfor %}
                 </div>
+
                 <div class="form__field">
-                    <label for="id_password">Password</label>
-                    {{ form.password|add_class:"input"|attr:"id:id_password"|attr:"placeholder:••••••••" }}
+                    <label for="id_password" class="text-[1.45rem]">Password</label>
+                    <div class="relative js-password-toggle">
+                        {{ form.password|add_class:"input pr-12"|attr:"id:id_password"|attr:"placeholder:••••••••"|attr:"autocomplete:current-password" }}
+                        <button type="button" aria-label="Toggle password visibility"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-text/60 hover:text-text transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
                     {% for error in form.password.errors %}
-                        <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
+                        <span class="text-[1.35rem] font-medium text-error block mt-1.5">{{ error }}</span>
                     {% endfor %}
                 </div>
+
                 {% if form.non_field_errors %}
-                    <div class="bg-red-50 rounded-xl p-[1.2rem] mb-[1.5rem]">
+                    <div class="bg-red-50 border border-red-100 rounded-2xl p-4 mb-2">
                         {% for error in form.non_field_errors %}
-                            <p class="text-[1.3rem] font-medium text-error">{{ error }}</p>
+                            <p class="text-[1.35rem] font-medium text-error">{{ error }}</p>
                         {% endfor %}
                     </div>
                 {% endif %}
-                <div class="flex flex-wrap items-center justify-between gap-[1rem] my-[2rem]">
-                    <input class="btn btn--sub text-[1.4rem]" type="submit" value="Log In" />
-                    <a href="{% url 'account_reset_password' %}"
-                       class="text-main text-[1.3rem] hover:underline">Forgot Password?</a>
+
+                <div class="flex items-center justify-between gap-3 mt-2 mb-6">
+                    <button type="submit" class="btn btn--sub text-[1.45rem] px-8">Log in</button>
+                    <a href="{% url 'account_reset_password' %}" class="text-main text-[1.4rem] hover:underline">Forgot password?</a>
                 </div>
             </form>
-            <div class="flex items-center gap-[1.5rem] my-[1.5rem]">
-                <div class="flex-1 h-[1px] bg-light/40"></div>
-                <span class="text-[1.2rem] text-text/40 font-medium uppercase tracking-wider">or</span>
-                <div class="flex-1 h-[1px] bg-light/40"></div>
+
+            <div class="flex items-center gap-4 my-6">
+                <div class="flex-1 h-px bg-light/50"></div>
+                <span class="text-[1.25rem] font-medium tracking-wider text-text/50">OR</span>
+                <div class="flex-1 h-px bg-light/50"></div>
             </div>
+
             <form method="post" action="{% url 'github_login' %}" hx-boost="false">
                 {% csrf_token %}
                 <button type="submit"
-                        class="w-full flex items-center justify-center gap-[1rem] py-[1.2rem] px-[2rem] rounded-xl bg-[#24292f] hover:bg-[#1b1f23] text-white text-[1.4rem] font-semibold transition-colors duration-200 border border-white/10 cursor-pointer">
-                    <svg class="w-[2rem] h-[2rem]" viewBox="0 0 24 24" fill="currentColor">
+                        class="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-2xl bg-[#24292f] hover:bg-[#1b1f23] active:bg-black text-white text-[1.45rem] font-semibold transition-colors border border-white/10">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     Continue with GitHub
                 </button>
             </form>
-            <div class="border-t border-light/60 pt-[2rem] mt-[2rem] text-center">
-                <p class="text-[1.4rem] text-text/50">
+
+            <div class="pt-8 mt-8 border-t border-light/50 text-center">
+                <p class="text-[1.45rem] text-text/60">
                     Don't have an account?
-                    <a href="{% url 'signup' %}"
-                       hx-target="#login-container"
-                       hx-swap="outerHTML"
-                       class="text-main font-semibold hover:underline ml-1">Sign Up</a>
+                    <a href="{% url 'signup' %}" hx-target="#login-container" hx-swap="outerHTML"
+                       class="text-main font-semibold hover:underline ml-1">Create one</a>
                 </p>
             </div>
         </div>
