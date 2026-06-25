@@ -23,8 +23,6 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 # ---------------------------------------------------------------------------
 # Backblaze B2 object storage (S3-compatible)
 # ---------------------------------------------------------------------------
-# All user-uploaded files (profile images, project images) go to B2.
-# Fallback to local filesystem when credentials are not provided.
 
 if config("B2_APPLICATION_KEY_ID", default=""):
     INSTALLED_APPS = list(INSTALLED_APPS) + ["storages"]
@@ -32,7 +30,6 @@ if config("B2_APPLICATION_KEY_ID", default=""):
     B2_ENDPOINT = config("B2_ENDPOINT", default="https://s3.us-east-005.backblazeb2.com")
     B2_BUCKET = config("B2_BUCKET_NAME", default="devsearchh")
 
-    DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
     AWS_ACCESS_KEY_ID = config("B2_APPLICATION_KEY_ID")
     AWS_SECRET_ACCESS_KEY = config("B2_APPLICATION_KEY")
     AWS_S3_ENDPOINT_URL = B2_ENDPOINT
@@ -43,5 +40,16 @@ if config("B2_APPLICATION_KEY_ID", default=""):
     AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = "public-read"
     AWS_QUERYSTRING_AUTH = False
+    AWS_LOCATION = ""
 
     MEDIA_URL = f"{B2_ENDPOINT}/{B2_BUCKET}/"
+
+    # Django 6.0+ uses STORAGES dict instead of DEFAULT_FILE_STORAGE.
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
