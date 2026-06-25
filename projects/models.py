@@ -12,8 +12,10 @@ class Project(models.Model):
 
     @property
     def image_url(self):
-        """Return the project image URL, falling back to the default if unset."""
+        """Return the project image URL, falling back to the default if unset or stale."""
         if self.featured_image and self.featured_image.name:
+            if self.featured_image.name == "default.jpg":
+                return "https://s3.us-east-005.backblazeb2.com/devsearchh/default_project.svg"
             return self.featured_image.url
         return "https://s3.us-east-005.backblazeb2.com/devsearchh/default_project.svg"
     tags = models.ManyToManyField('Tag', blank=True)

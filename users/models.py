@@ -15,8 +15,13 @@ class Profile(models.Model):
 
     @property
     def image_url(self):
-        """Return the profile image URL, falling back to the default if unset."""
+        """Return the profile image URL, falling back to the default if unset or stale."""
         if self.profile_image and self.profile_image.name:
+            if self.profile_image.name in (
+                "profiles/user-default.png",
+                "profiles/user-default.jpg",
+            ):
+                return "https://s3.us-east-005.backblazeb2.com/devsearchh/default_profile.svg"
             return self.profile_image.url
         return "https://s3.us-east-005.backblazeb2.com/devsearchh/default_profile.svg"
     social_github = models.URLField(blank=True, default="")
