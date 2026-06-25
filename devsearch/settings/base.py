@@ -86,13 +86,34 @@ AUTHENTICATION_BACKENDS = [
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
+# SQLite by default (local dev).  When DB_NAME is set in the environment
+# (i.e. production), PostgreSQL kicks in automatically.
+# Uses schema-based isolation via DB_SCHEMA so multiple projects can share
+# one PostgreSQL instance without table collisions.
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if config("DB_NAME", default=""):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("DB_NAME"),
+            "USER": config("DB_USER"),
+            "PASSWORD": config("DB_PASSWORD"),
+            "HOST": config("DB_HOST"),
+            "PORT": config("DB_PORT", default="5432"),
+            "OPTIONS": {
+                "options": "-c search_path={}".format(
+                    config("DB_SCHEMA", default="devsearch")
+                ),
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # ---------------------------------------------------------------------------
 # Password validation
@@ -134,22 +155,33 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------------------------------------------------------------------
 # Email configuration
 # ---------------------------------------------------------------------------
+#
+# Architecture:
+#   Django app  →  django-mailer (DB queue)  →  runmailer worker  →  SMTP  →  Mailtrap
+#
+# In dev (no EMAIL_HOST set): uses Mailtrap sandbox SMTP (catches all mail).
+# In prod (EMAIL_HOST set):   uses your real SMTP provider.
+#
+# Sign up at https://mailtrap.io — use the SMTP credentials tab (not API).
 
-if DEBUG:
-    EMAIL_HOST = config("DEV_EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
-    EMAIL_HOST_USER = config("DEV_EMAIL_USER")
-    EMAIL_HOST_PASSWORD = config("DEV_EMAIL_PASSWORD")
-    EMAIL_PORT = config("DEV_EMAIL_PORT", default=2525, cast=int)
-else:
+if config("EMAIL_HOST", default=""):
+    # Production — real SMTP
     EMAIL_HOST = config("EMAIL_HOST")
     EMAIL_HOST_USER = config("EMAIL_USER")
     EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
     EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+else:
+    # Development — Mailtrap sandbox
+    EMAIL_HOST = config("DEV_EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
+    EMAIL_HOST_USER = config("DEV_EMAIL_USER")
+    EMAIL_HOST_PASSWORD = config("DEV_EMAIL_PASSWORD")
+    EMAIL_PORT = config("DEV_EMAIL_PORT", default=25, cast=int)
 
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 
-# Use django-mailer to queue emails in the database.
+# Queue all emails in the DB so the HTTP response returns immediately.
+# The background worker (runmailer) dispatches them via SMTP.
 EMAIL_BACKEND = "mailer.backend.DbBackend"
 MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
