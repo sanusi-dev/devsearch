@@ -33,7 +33,7 @@ if config("B2_APPLICATION_KEY_ID", default=""):
     AWS_ACCESS_KEY_ID = config("B2_APPLICATION_KEY_ID")
     AWS_SECRET_ACCESS_KEY = config("B2_APPLICATION_KEY")
     AWS_S3_ENDPOINT_URL = config("B2_ENDPOINT", default="https://s3.us-east-005.backblazeb2.com")
-    AWS_STORAGE_BUCKET_NAME = config("B2_BUCKET_NAME", default="devsearch")
+    AWS_STORAGE_BUCKET_NAME = config("B2_BUCKET_NAME", default="devsearchh")
     AWS_S3_REGION_NAME = config("B2_REGION", default="us-east-005")
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_FILE_OVERWRITE = False

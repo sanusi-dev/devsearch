@@ -27,7 +27,7 @@ services:
       - key: B2_ENDPOINT
         value: "https://s3.us-east-005.backblazeb2.com"
       - key: B2_BUCKET_NAME
-        value: "devsearch"
+        value: "devsearchh"
       - key: B2_REGION
         value: "us-east-005"
       - key: DATABASE_URL
