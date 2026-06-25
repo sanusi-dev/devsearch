@@ -1,2 +1,1 @@
-web: gunicorn devsearch.wsgi --bind 0.0.0.0:$PORT
-worker: python manage.py runmailer
+web: python manage.py runmailer & gunicorn devsearch.wsgi --bind 0.0.0.0:$PORT

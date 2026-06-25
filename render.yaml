@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py ensure_superuser && python manage.py seed_tags"
-    startCommand: "gunicorn devsearch.wsgi --bind 0.0.0.0:$PORT"
+    startCommand: "python manage.py runmailer & gunicorn devsearch.wsgi --bind 0.0.0.0:$PORT"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: devsearch.settings.prod
