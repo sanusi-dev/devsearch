@@ -97,7 +97,7 @@
   .card {
     @apply rounded-2xl bg-white w-auto h-auto my-[0.5rem] overflow-hidden
            shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)]
-           border border-light/50
+           border border-light/50 p-[2rem_2rem] sm:p-[3.5rem] md:p-[5rem]
            transition-all duration-300 ease-out;
   }
   .card__body, .card__header { @apply p-[2rem_2.5rem]; }

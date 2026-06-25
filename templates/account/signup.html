@@ -3,78 +3,68 @@
 {% load widget_tweaks %}
 {% block content %}
     {% partialdef signup-form-partial inline %}
-    <div class="relative w-full min-h-[85vh] flex justify-center items-center z-10 bg-transparent py-[2rem]"
+    <div class="relative w-full min-h-screen flex justify-center items-center bg-sub py-[2rem] px-4"
          id="signup-container">
-        <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-sub via-sub-light/80 to-main/40"></div>
-        <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top_right,rgba(90,165,185,0.2)_0%,transparent_60%)]">
-        </div>
-        <div class="card w-[95%] max-w-[55rem] p-[2rem_2rem] sm:p-[3rem_3.5rem] md:p-[5rem_6rem] shadow-[0_8px_40px_rgba(0,0,0,0.2)] border-white/10 animate-slide-up">
+        <div class="card w-full max-w-[44rem] shadow-[0_8px_40px_rgba(0,0,0,0.2)] animate-slide-up">
             <div class="text-center">
-                <a href="/" class="inline-block">
-                    <img src="{% static 'images/icon.svg' %}"
-                         alt="icon"
-                         class="mx-auto h-[5rem]" />
-                </a>
-                <h3 class="text-[2.8rem] text-sub font-bold mt-[1.5rem]">Create Account</h3>
-                <p class="font-normal text-[1.5rem] text-text/60 mb-[2rem]">Join the developer community</p>
+                <img src="{% static 'images/icon.svg' %}"
+                     alt="DevSearch"
+                     class="mx-auto h-[4.5rem]" />
+                <h3 class="text-[2.4rem] text-sub font-bold mt-[1.5rem]">Create Account</h3>
+                <p class="text-[1.4rem] text-text/60 mb-[2rem]">Join the developer community</p>
             </div>
-            {# ── Email + Password Signup ── #}
-            <form class="form my-[2rem]"
+            <form class="form"
                   method="post"
                   action="{% url 'account_signup' %}">
                 {% csrf_token %}
                 <div class="form__field">
-                    <label for="id_email">Email:</label>
-                    {{ form.email|add_class:"input"|attr:"id:id_email"|attr:"placeholder:e.g. user@domain.com" }}
+                    <label for="id_email">Email</label>
+                    {{ form.email|add_class:"input"|attr:"id:id_email"|attr:"placeholder:you@domain.com" }}
                     {% for error in form.email.errors %}
                         <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="form__field">
-                    <label for="id_password1">Password:</label>
+                    <label for="id_password1">Password</label>
                     {{ form.password1|add_class:"input"|attr:"id:id_password1"|attr:"placeholder:••••••••" }}
                     {% for error in form.password1.errors %}
                         <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="form__field">
-                    <label for="id_password2">Confirm Password:</label>
+                    <label for="id_password2">Confirm Password</label>
                     {{ form.password2|add_class:"input"|attr:"id:id_password2"|attr:"placeholder:••••••••" }}
                     {% for error in form.password2.errors %}
                         <span class="text-[1.3rem] font-medium text-error block mt-1">{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% if form.non_field_errors %}
-                    <div class="bg-error-bg rounded-xl p-[1.2rem] mb-[1.5rem]">
-                        <ul class="text-[1.3rem] font-medium text-error list-none">
-                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
+                    <div class="bg-red-50 rounded-xl p-[1.2rem] mb-[1.5rem]">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-[1.3rem] font-medium text-error">{{ error }}</p>
+                        {% endfor %}
                     </div>
                 {% endif %}
-                <div class="my-[2.5rem]">
-                    <input class="btn btn--sub text-[1.4rem]"
-                           type="submit"
-                           value="Create Account" />
+                <div class="my-[2rem]">
+                    <input class="btn btn--sub text-[1.4rem] w-full" type="submit" value="Create Account" />
                 </div>
             </form>
-            {# ── Divider ── #}
-            <div class="flex items-center gap-[1.5rem] my-[2rem]">
+            <div class="flex items-center gap-[1.5rem] my-[1.5rem]">
                 <div class="flex-1 h-[1px] bg-light/40"></div>
-                <span class="text-[1.3rem] text-text/40 font-medium uppercase tracking-wider">or</span>
+                <span class="text-[1.2rem] text-text/40 font-medium uppercase tracking-wider">or</span>
                 <div class="flex-1 h-[1px] bg-light/40"></div>
             </div>
-            {# ── GitHub OAuth ── #}
             <form method="post" action="{% url 'github_login' %}" hx-boost="false">
                 {% csrf_token %}
                 <button type="submit"
-                        class="w-full flex items-center justify-center gap-[1rem] py-[1.2rem] px-[2rem] rounded-xl bg-[#24292f] hover:bg-[#1b1f23] text-white text-[1.4rem] font-semibold transition-all duration-200 ease-out hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-white/10 cursor-pointer">
+                        class="w-full flex items-center justify-center gap-[1rem] py-[1.2rem] px-[2rem] rounded-xl bg-[#24292f] hover:bg-[#1b1f23] text-white text-[1.4rem] font-semibold transition-colors duration-200 border border-white/10 cursor-pointer">
                     <svg class="w-[2rem] h-[2rem]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     Sign up with GitHub
                 </button>
             </form>
-            <div class="border-t border-light/60 pt-[2rem] mt-[2.5rem]">
+            <div class="border-t border-light/60 pt-[2rem] mt-[2rem] text-center">
                 <p class="text-[1.4rem] text-text/50">
                     Already have an account?
                     <a href="{% url 'login' %}"
