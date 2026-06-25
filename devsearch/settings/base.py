@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import dj_database_url
 from decouple import config, Csv
 
 # ---------------------------------------------------------------------------
@@ -86,12 +87,13 @@ AUTHENTICATION_BACKENDS = [
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
-# SQLite by default (local dev).  When DB_NAME is set in the environment
-# (i.e. production), PostgreSQL kicks in automatically.
-# Uses schema-based isolation via DB_SCHEMA so multiple projects can share
-# one PostgreSQL instance without table collisions.
+# Priority: Render's DATABASE_URL  >  individual DB_* vars  >  SQLite fallback
 
-if config("DB_NAME", default=""):
+if config("DATABASE_URL", default=""):
+    DATABASES = {
+        "default": dj_database_url.parse(config("DATABASE_URL"))
+    }
+elif config("DB_NAME", default=""):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -174,8 +176,8 @@ if config("EMAIL_HOST", default=""):
 else:
     # Development — Mailtrap sandbox
     EMAIL_HOST = config("DEV_EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
-    EMAIL_HOST_USER = config("DEV_EMAIL_USER")
-    EMAIL_HOST_PASSWORD = config("DEV_EMAIL_PASSWORD")
+    EMAIL_HOST_USER = config("DEV_EMAIL_USER", default="")
+    EMAIL_HOST_PASSWORD = config("DEV_EMAIL_PASSWORD", default="")
     EMAIL_PORT = config("DEV_EMAIL_PORT", default=25, cast=int)
 
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
