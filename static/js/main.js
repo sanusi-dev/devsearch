@@ -82,8 +82,17 @@ document.body.addEventListener('messages', function(evt) {
 processDjangoMessages();
 updateActiveNav();
 
+// Function to close the mobile hamburger menu
+function closeMobileMenu() {
+    const menuCheckbox = document.getElementById('responsive-menu');
+    if (menuCheckbox) {
+        menuCheckbox.checked = false;
+    }
+}
+
 // Run after every HTMX swap
 document.addEventListener('htmx:afterSwap', function(evt) {
+    closeMobileMenu();
     updateActiveNav();
     processDjangoMessages(); // Check for messages in swapped content
 });

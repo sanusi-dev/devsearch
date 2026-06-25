@@ -110,7 +110,7 @@
   .form__field { @apply my-[1.5rem]; }
   .form__label, .form__field > label { @apply block mb-[0.5rem] text-text font-medium text-[1.4rem]; }
   .input {
-    @apply min-w-[24rem] w-full py-[1.2rem] px-[1.5rem] rounded-xl
+    @apply min-w-0 w-full py-[1.2rem] px-[1.5rem] rounded-xl
            border-2 border-transparent bg-bg
            transition-all duration-300
            hover:bg-light/40

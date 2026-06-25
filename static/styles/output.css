@@ -984,7 +984,7 @@ a {
 
 .input {
   width: 100%;
-  min-width: 24rem;
+  min-width: 0;
   border-radius: 0.75rem;
   border-width: 2px;
   border-color: transparent;
