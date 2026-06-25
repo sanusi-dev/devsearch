@@ -10,7 +10,7 @@
                     <div class="card text-center md:sticky md:top-[8rem]">
                         <div class="p-[4rem]">
                             <img class="avatar avatar--xl block mx-auto"
-                                 src="{{ profile.profile_image.url }}" />
+                                 src="{{ profile.image_url }}" />
                             <h2 class="text-sub text-[2.8rem] font-bold mt-[1.5rem] mb-[0.3rem]">{{ profile.name }}</h2>
                             {% if profile.short_intro %}
                                 <p class="text-[1.5rem] font-medium text-text/70 leading-[1.4]">{{ profile.short_intro }}</p>
@@ -169,7 +169,7 @@
                                            hx-swap="outerHTML show:window:top">
                                             <div class="overflow-hidden">
                                                 <img class="h-[20rem] w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                                                     src="{{ project.featured_image.url }}"
+                                                     src="{{ project.image_url }}"
                                                      alt="project thumbnail" />
                                             </div>
                                             <div class="card__body">

@@ -42,7 +42,7 @@
                 <div class="column column--2of3 order-1 md:order-2">
                     <div class="overflow-hidden rounded-2xl mb-[3rem] shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
                         <img class="h-[50vh] w-full object-cover object-top"
-                             src="{{ project.featured_image.url }}"
+                             src="{{ project.image_url }}"
                              alt="portfolio thumbnail" />
                     </div>
                     <a href="{% url 'profile_detail' project.owner.id %}"
@@ -109,7 +109,7 @@
                                            hx-target="#project-detail-container"
                                            hx-swap="outerHTML show:window:top">
                                             <img class="w-[4rem] h-[4rem] rounded-full object-cover ring-2 ring-main/10 ring-offset-1 shrink-0"
-                                                 src="{{ reviewer.owner.profile_image.url }}"
+                                                 src="{{ reviewer.owner.image_url }}"
                                                  alt="user" />
                                             <div class="min-w-0">
                                                 <span class="text-[1.5rem] font-semibold text-sub hover:text-main transition-colors block">{{ reviewer.owner.name }}</span>

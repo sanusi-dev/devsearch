@@ -29,7 +29,7 @@
                                 <!-- Avatar + unread dot -->
                                 <div class="relative shrink-0">
                                     {% if message.sender %}
-                                        <img src="{{ message.sender.profile_image.url }}"
+                                        <img src="{{ message.sender.image_url }}"
                                              alt="{{ message.name }}"
                                              class="avatar avatar--md" />
                                     {% else %}

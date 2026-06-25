@@ -9,6 +9,13 @@ class Project(models.Model):
     demo_link = models.URLField(null=True, blank=True, max_length=2000)
     source_link = models.URLField(null=True, blank=True, max_length=2000)
     featured_image = models.ImageField(upload_to="projects/", null=True, blank=True, default="default_project.svg")
+
+    @property
+    def image_url(self):
+        """Return the project image URL, falling back to the default if unset."""
+        if self.featured_image and self.featured_image.name:
+            return self.featured_image.url
+        return "https://devsearchh.s3.us-east-005.backblazeb2.com/default_project.svg"
     tags = models.ManyToManyField('Tag', blank=True)
     vote_total = models.IntegerField(null=True, default=0, blank=True)
     vote_ratio = models.IntegerField(null=True, default=0, blank=True)

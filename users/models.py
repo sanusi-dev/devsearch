@@ -12,6 +12,13 @@ class Profile(models.Model):
     short_intro = models.CharField(max_length=200, blank=True, default="")
     bio = models.TextField(blank=True, default="")
     profile_image = models.ImageField(upload_to="profiles/", blank=True, default="default_profile.svg")
+
+    @property
+    def image_url(self):
+        """Return the profile image URL, falling back to the default if unset."""
+        if self.profile_image and self.profile_image.name:
+            return self.profile_image.url
+        return "https://devsearchh.s3.us-east-005.backblazeb2.com/default_profile.svg"
     social_github = models.URLField(blank=True, default="")
     social_twitter = models.URLField(blank=True, default="")
     social_linkedin = models.URLField(blank=True, default="")

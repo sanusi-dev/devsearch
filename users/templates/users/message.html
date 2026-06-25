@@ -46,7 +46,7 @@
                         <a href="{% url 'profile_detail' message.sender.id %}"
                            hx-target="#message-detail-partial"
                            hx-swap="outerHTML show:window:top">
-                            <img src="{{ message.sender.profile_image.url }}"
+                            <img src="{{ message.sender.image_url }}"
                                  alt="{{ message.sender.name }}"
                                  class="avatar avatar--xl border-2 border-light/30" />
                         </a>

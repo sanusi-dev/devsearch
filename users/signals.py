@@ -36,6 +36,7 @@ def create_profile(sender, instance, created, *args, **kwargs):
             name=name,
             email=user.email,
             username=user.username,
+            profile_image="default_profile.svg",
         )
 
 

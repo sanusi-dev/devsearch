@@ -16,7 +16,7 @@
                                 <i class="im im-edit"></i> Edit Profile
                             </a>
                             <img class="avatar avatar--xl block mx-auto"
-                                 src="{{ profile.profile_image.url }}" />
+                                 src="{{ profile.image_url }}" />
                             <h2 class="text-sub text-[2.6rem] font-bold mt-[1.5rem] mb-[0.3rem]">{{ profile.name }}</h2>
                             {% if profile.short_intro %}
                                 <p class="text-[1.5rem] font-medium text-text/70 leading-[1.4]">{{ profile.short_intro }}</p>
@@ -123,7 +123,7 @@
                                            class="flex items-center gap-[1.5rem] flex-1 min-w-0"
                                            hx-target="#account-container"
                                            hx-swap="outerHTML show:window:top">
-                                            <img src="{{ project.featured_image.url }}"
+                                            <img src="{{ project.image_url }}"
                                                  alt="Project Thumbnail"
                                                  class="w-[8rem] h-[6rem] object-cover rounded-lg shrink-0" />
                                             <div class="min-w-0">
