@@ -8,7 +8,7 @@ class Project(models.Model):
     description = models.TextField(null=True, blank=True)
     demo_link = models.URLField(null=True, blank=True, max_length=2000)
     source_link = models.URLField(null=True, blank=True, max_length=2000)
-    featured_image = models.ImageField(upload_to="projects/", null=True, blank=True, default="default_project.jpg")
+    featured_image = models.ImageField(upload_to="projects/", null=True, blank=True, default="default_project.svg")
     tags = models.ManyToManyField('Tag', blank=True)
     vote_total = models.IntegerField(null=True, default=0, blank=True)
     vote_ratio = models.IntegerField(null=True, default=0, blank=True)
