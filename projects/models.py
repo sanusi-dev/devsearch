@@ -15,7 +15,7 @@ class Project(models.Model):
         """Return the project image URL, falling back to the default if unset."""
         if self.featured_image and self.featured_image.name:
             return self.featured_image.url
-        return "https://devsearchh.s3.us-east-005.backblazeb2.com/default_project.svg"
+        return "https://s3.us-east-005.backblazeb2.com/devsearchh/default_project.svg"
     tags = models.ManyToManyField('Tag', blank=True)
     vote_total = models.IntegerField(null=True, default=0, blank=True)
     vote_ratio = models.IntegerField(null=True, default=0, blank=True)

@@ -29,17 +29,19 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 if config("B2_APPLICATION_KEY_ID", default=""):
     INSTALLED_APPS = list(INSTALLED_APPS) + ["storages"]
 
+    B2_ENDPOINT = config("B2_ENDPOINT", default="https://s3.us-east-005.backblazeb2.com")
+    B2_BUCKET = config("B2_BUCKET_NAME", default="devsearchh")
+
     DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
     AWS_ACCESS_KEY_ID = config("B2_APPLICATION_KEY_ID")
     AWS_SECRET_ACCESS_KEY = config("B2_APPLICATION_KEY")
-    AWS_S3_ENDPOINT_URL = config("B2_ENDPOINT", default="https://s3.us-east-005.backblazeb2.com")
-    AWS_STORAGE_BUCKET_NAME = config("B2_BUCKET_NAME", default="devsearchh")
+    AWS_S3_ENDPOINT_URL = B2_ENDPOINT
+    AWS_STORAGE_BUCKET_NAME = B2_BUCKET
     AWS_S3_REGION_NAME = config("B2_REGION", default="us-east-005")
     AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_S3_ADDRESSING_STYLE = "path"
     AWS_S3_FILE_OVERWRITE = False
-    AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = False  # public-read files
-    AWS_QUERYSTRING_EXPIRE = 3600
+    AWS_DEFAULT_ACL = "public-read"
+    AWS_QUERYSTRING_AUTH = False
 
-    # Public URL for uploaded media — Backblaze serves directly from the bucket.
-    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/"
+    MEDIA_URL = f"{B2_ENDPOINT}/{B2_BUCKET}/"
