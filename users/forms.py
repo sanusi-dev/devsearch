@@ -6,7 +6,21 @@ from .models import Profile, Skill, Message
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        exclude = ("user",)
+        fields = [
+            "name",
+            "email",
+            "username",
+            "location",
+            "short_intro",
+            "bio",
+            "profile_image",
+            "social_github",
+            "social_twitter",
+            "social_linkedin",
+            "social_youtube",
+            "social_website",
+            "receive_notifications",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

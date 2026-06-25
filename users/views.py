@@ -2,20 +2,27 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.core.signing import Signer, BadSignature
 
 from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.views import LoginView, SignupView
 from django_htmx.http import retarget
 
+from projects.models import Project
 from .models import Profile, Skill, Message
 from .forms import ProfileForm, SkillForm, MessageForm
 from .utils import search_profiles
 from projects.utils import pagination
 
 
+def _get_user_profile(request):
+    """Safely retrieve the current user's profile, or return 404."""
+    return get_object_or_404(Profile, user=request.user)
+
+
 def signup_view(request):
+    """Render the signup page, or redirect if already authenticated."""
     if request.user.is_authenticated:
         return redirect("profile_list")
 
@@ -28,6 +35,7 @@ def signup_view(request):
 
 
 def login_view(request):
+    """Render the login page, or redirect if already authenticated."""
     if request.user.is_authenticated:
         return redirect("profile_list")
 
@@ -40,11 +48,13 @@ def login_view(request):
 
 
 def logout_user(request):
+    """Log out the current user and redirect to the login page."""
     logout(request)
     return redirect("login")
 
 
 class CustomLoginView(LoginView):
+    """All auth login view override — returns partial HTML on HTMX validation errors."""
 
     def form_invalid(self, form):
         if self.request.htmx:
@@ -56,6 +66,7 @@ class CustomLoginView(LoginView):
 
 
 class CustomSignupView(SignupView):
+    """All auth signup view override — returns partial HTML on HTMX validation errors."""
 
     def form_invalid(self, form):
         if self.request.htmx:
@@ -67,6 +78,7 @@ class CustomSignupView(SignupView):
 
 
 def profile_list(request):
+    """List developer profiles with search and pagination."""
     search_query, profiles = search_profiles(request)
     page_obj = pagination(request, profiles)
 
@@ -83,7 +95,14 @@ def profile_list(request):
 
 
 def profile_detail(request, pk):
-    profile = get_object_or_404(Profile, id=pk)
+    """Show a single developer profile with skills and projects."""
+    profile = get_object_or_404(
+        Profile.objects.prefetch_related(
+            Prefetch("skill_set", queryset=Skill.objects.order_by("name")),
+            Prefetch("project_set", queryset=Project.objects.prefetch_related("tags")),
+        ),
+        id=pk,
+    )
     context = {"profile": profile}
 
     if request.htmx:
@@ -94,7 +113,18 @@ def profile_detail(request, pk):
 
 @login_required(login_url="login")
 def user_account(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    """Show the current user's account dashboard with skills, projects, and stats."""
+    profile, _created = Profile.objects.get_or_create(user=request.user)
+    # Prefetch related objects to avoid N+1 queries in the template.
+    profile = (
+        Profile.objects.filter(id=profile.id)
+        .prefetch_related(
+            Prefetch("skill_set", queryset=Skill.objects.order_by("name")),
+            Prefetch("project_set", queryset=Project.objects.prefetch_related("tags")),
+            "messages",
+        )
+        .first()
+    )
     context = {"profile": profile}
 
     if request.htmx:
@@ -105,18 +135,17 @@ def user_account(request):
 
 @login_required(login_url="login")
 def profile_edit(request):
-    profile_form = ProfileForm(instance=request.user.profile)
+    """Edit the current user's profile."""
+    profile = _get_user_profile(request)
+    profile_form = ProfileForm(instance=profile)
 
     if request.method == "POST":
-        profile_form = ProfileForm(
-            request.POST, request.FILES, instance=request.user.profile
-        )
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         if profile_form.is_valid():
             profile_form.save()
             messages.success(request, "Profile updated successfully!")
             return redirect("account")
 
-        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"profile_form": profile_form}
             return render(request, "users/profile_form.html#profile-form-partial", context)
@@ -131,7 +160,8 @@ def profile_edit(request):
 
 @login_required(login_url="login")
 def skill_form(request, pk=None):
-    profile = request.user.profile
+    """Create or edit a skill for the current user's profile."""
+    profile = _get_user_profile(request)
     skill = get_object_or_404(Skill, id=pk, owner=profile) if pk else None
     form_title = "Edit Skill" if pk else "Add Skill"
 
@@ -146,7 +176,6 @@ def skill_form(request, pk=None):
             messages.success(request, f"Skill '{new_skill.name}' {action} successfully!")
             return redirect("account")
 
-        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"form": form, "skill": skill, "form_title": form_title}
             return render(request, "users/skill_create.html#skill-form-partial", context)
@@ -161,11 +190,14 @@ def skill_form(request, pk=None):
 
 @login_required(login_url="login")
 def delete_skill(request, pk):
-    skill = get_object_or_404(Skill, id=pk, owner=request.user.profile)
+    """Delete a skill owned by the current user."""
+    profile = _get_user_profile(request)
+    skill = get_object_or_404(Skill, id=pk, owner=profile)
 
     if request.method == "POST":
+        skill_name = skill.name
         skill.delete()
-        messages.success(request, f"Skill '{skill.name}' deleted successfully!")
+        messages.success(request, f"Skill '{skill_name}' deleted successfully!")
         return redirect("account")
 
     return redirect("account")
@@ -173,8 +205,9 @@ def delete_skill(request, pk):
 
 @login_required(login_url="login")
 def inbox(request):
-    profile = request.user.profile
-    un_read = profile.messages.filter(is_read=False).count()
+    """Show the current user's message inbox."""
+    profile = _get_user_profile(request)
+    un_read = Message.objects.filter(recipient=profile, is_read=False).count()
     context = {"profile": profile, "un_read": un_read}
 
     if request.htmx:
@@ -185,12 +218,13 @@ def inbox(request):
 
 @login_required(login_url="login")
 def message(request, pk):
-    recipient = request.user.profile
-    msg = get_object_or_404(Message, id=pk, recipient=recipient)
+    """Show a single message sent to the current user."""
+    profile = _get_user_profile(request)
+    msg = get_object_or_404(Message, id=pk, recipient=profile)
 
     if not msg.is_read:
         msg.is_read = True
-        msg.save()
+        msg.save(update_fields=["is_read"])
 
     context = {"message": msg}
 
@@ -202,7 +236,9 @@ def message(request, pk):
 
 @login_required(login_url="login")
 def delete_message(request, pk):
-    msg = get_object_or_404(Message, id=pk, recipient=request.user.profile)
+    """Delete a message sent to the current user."""
+    profile = _get_user_profile(request)
+    msg = get_object_or_404(Message, id=pk, recipient=profile)
 
     if request.method == "POST":
         msg.delete()
@@ -213,6 +249,7 @@ def delete_message(request, pk):
 
 
 def send_message(request, pk):
+    """Send a message to a developer profile."""
     recipient = get_object_or_404(Profile, id=pk)
     message_form = MessageForm()
 
@@ -221,15 +258,15 @@ def send_message(request, pk):
         if message_form.is_valid():
             msg = message_form.save(commit=False)
             if request.user.is_authenticated:
-                msg.sender = request.user.profile
-                msg.name = request.user.profile.name
-                msg.email = request.user.profile.email
+                sender_profile, _ = Profile.objects.get_or_create(user=request.user)
+                msg.sender = sender_profile
+                msg.name = sender_profile.name
+                msg.email = sender_profile.email
             msg.recipient = recipient
             msg.save()
             messages.success(request, "Message sent successfully!")
             return redirect("profile_detail", pk=recipient.id)
 
-        # Validation errors — re-render form partial for HTMX requests.
         if request.htmx:
             context = {"message_form": message_form, "recipient": recipient}
             return render(request, "users/send_message.html#send-message-partial", context)
@@ -243,12 +280,13 @@ def send_message(request, pk):
 
 
 def unsubscribe(request, signature):
+    """Process an unsubscribe link from notification emails."""
     signer = Signer()
     try:
         profile_id = signer.unsign(signature)
         profile = get_object_or_404(Profile, id=profile_id)
         profile.receive_notifications = False
-        profile.save()
+        profile.save(update_fields=["receive_notifications"])
         messages.success(
             request, "You have been successfully unsubscribed from email notifications."
         )

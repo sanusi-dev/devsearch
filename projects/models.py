@@ -15,9 +15,11 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         return self.title.title()
-
 
 
 class Review(models.Model):
@@ -32,17 +34,21 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
-    def __str__(self):
-        return self.value
-    
     class Meta:
+        ordering = ["-created_at"]
         unique_together = [["project", "owner"]]
+
+    def __str__(self):
+        return f"{self.value} vote by {self.owner.name if self.owner else 'Unknown'} on {self.project.title if self.project else 'Unknown'}"
 
 
 class Tag(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     name = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self):
         return self.name.title()

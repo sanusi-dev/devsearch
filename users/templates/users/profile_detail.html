@@ -95,7 +95,7 @@
                                     <li class="text-[1.3rem] text-text/30 italic">No social links added</li>
                                 {% endif %}
                             </ul>
-                            {% if request.user.profile != profile %}
+                            {% if request.user.is_authenticated and request.user.profile.id != profile.id %}
                                 <a href="{% url 'send_message' pk=profile.id %}"
                                    class="btn btn--main text-[1.4rem]"
                                    hx-target="#profile-detail-container"
