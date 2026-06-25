@@ -17,7 +17,7 @@ SECURE_HSTS_PRELOAD = True
 # Set these on Pxxl as normal env vars (not DEV_ prefixed).
 # ---------------------------------------------------------------------------
 
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_HOST_USER = config("EMAIL_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
+EMAIL_HOST = config("EMAIL_HOST", default="")
+EMAIL_HOST_USER = config("EMAIL_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD", default="")
 EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
