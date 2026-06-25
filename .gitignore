@@ -61,3 +61,4 @@ take_screenshots.*
 # Video generation scripts
 record_demo.*
 test_video.*
+dev_session.json
