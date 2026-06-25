@@ -40,7 +40,6 @@ if config("B2_APPLICATION_KEY_ID", default=""):
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False  # public-read files
     AWS_QUERYSTRING_EXPIRE = 3600
-    AWS_LOCATION = "media"
 
     # Public URL for uploaded media — Backblaze serves directly from the bucket.
-    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/"
