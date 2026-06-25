@@ -83,18 +83,29 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- Empty search results state -->
-                        <div class="flex flex-col items-center justify-center py-[8rem] text-center">
-                            <i class="im im-users text-text/10 text-[5rem] mb-[1.5rem] block"></i>
-                            <h3 class="text-[2rem] font-bold text-sub/50 mb-[0.6rem]">No developers found</h3>
-                            <p class="text-[1.4rem] text-text/35 mb-[2rem]">
-                                No results for <span class="text-text/55 font-semibold">"{{ search_query }}"</span>. Try a different name or skill.
-                            </p>
-                            <a href="{% url 'profile_list' %}"
-                               class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
-                               hx-target="#profile-list-container"
-                               hx-swap="outerHTML show:window:top">Clear search</a>
-                        </div>
+                        {% if search_query %}
+                            <!-- Search returned no results -->
+                            <div class="flex flex-col items-center justify-center py-[8rem] text-center">
+                                <i class="im im-users text-text/10 text-[5rem] mb-[1.5rem] block"></i>
+                                <h3 class="text-[2rem] font-bold text-sub/50 mb-[0.6rem]">No developers found</h3>
+                                <p class="text-[1.4rem] text-text/35 mb-[2rem]">
+                                    No results for <span class="text-text/55 font-semibold">"{{ search_query }}"</span>. Try a different name or skill.
+                                </p>
+                                <a href="{% url 'profile_list' %}"
+                                   class="text-[1.3rem] text-main/70 hover:text-main underline underline-offset-2 transition-colors"
+                                   hx-target="#profile-list-container"
+                                   hx-swap="outerHTML show:window:top">Clear search</a>
+                            </div>
+                        {% else %}
+                            <!-- No profiles in database yet -->
+                            <div class="flex flex-col items-center justify-center py-[8rem] text-center">
+                                <i class="im im-users text-text/10 text-[5rem] mb-[1.5rem] block"></i>
+                                <h3 class="text-[2rem] font-bold text-sub/50 mb-[0.6rem]">No developers yet</h3>
+                                <p class="text-[1.4rem] text-text/35">
+                                    Be the first to create a profile and get discovered.
+                                </p>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </section>
