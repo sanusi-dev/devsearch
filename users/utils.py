@@ -9,8 +9,11 @@ def search_profiles(request):
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
 
-    profiles = Profile.objects.prefetch_related('skill_set').filter(Q(name__icontains=search_query) | 
-                                      Q(short_intro__icontains=search_query) |
-                                      Q(skill__name__icontains=search_query)).distinct()
+    profiles = Profile.objects.prefetch_related('skill_set').filter(
+        Q(user__isnull=True) | Q(user__is_superuser=False),
+        Q(name__icontains=search_query) | 
+        Q(short_intro__icontains=search_query) |
+        Q(skill__name__icontains=search_query),
+    ).distinct()
     
     return search_query, profiles
